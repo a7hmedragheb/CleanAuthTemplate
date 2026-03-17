@@ -1,3 +1,5 @@
+using Template.Api;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +9,10 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+
+builder.Services.AddDependencies(builder.Configuration);
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
