@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -7,6 +8,12 @@ namespace Template.Api.Authentication;
 
 public class JwtProvider : IJwtProvider
 {
+	private readonly JwtOptions _jwtOptions;
+	public JwtProvider(IOptions<JwtOptions> jwtOptions)
+	{
+		_jwtOptions = jwtOptions.Value;
+	}
+
 	public (string token, int expiresIn) GenerateToken(ApplicationUser user)
 	{
 		Claim[] claims = [
@@ -19,17 +26,17 @@ public class JwtProvider : IJwtProvider
 			new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 		];
 
-		var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("OJGU6faPX0DuRf2j6OfdbiMwVAGNXZnK"));
+		var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.key));
 
 		var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
 
-		var expiresIn = 30;
+		var expiresIn = _jwtOptions.ExpiryMinutes;
 
 		var expirationDate = DateTime.UtcNow.AddMinutes(expiresIn);
 
 		var token = new JwtSecurityToken(
-			issuer: "Template",
-			audience: "Template users",
+			issuer: _jwtOptions.Issuer,
+			audience: _jwtOptions.Audience,
 			claims: claims,
 			expires: expirationDate,
 			signingCredentials: signingCredentials

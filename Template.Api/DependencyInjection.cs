@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Reflection;
 using System.Text;
+using Template.Api.Authentication;
 
 namespace Template.Api;
 
@@ -25,7 +26,7 @@ public static class DependencyInjection
 		services
 			.AddMapsterConfig()
 			.AddFluentValidationConfig()
-			.AddAuthorConfig();
+			.AddAuthorConfig(configuration);
 
 		return services;
 	}
@@ -50,10 +51,20 @@ public static class DependencyInjection
 		return services;
 	}
 
-	private static IServiceCollection AddAuthorConfig(this IServiceCollection services)
+	private static IServiceCollection AddAuthorConfig(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddIdentity<ApplicationUser, IdentityRole>()
 			.AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+		services.AddScoped<IJwtProvider, JwtProvider>();
+
+		services.AddOptions<JwtOptions>()
+			.BindConfiguration(JwtOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
+
+		var JwtSettings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
 
 		services.AddAuthentication(options =>
 		{
@@ -69,9 +80,9 @@ public static class DependencyInjection
 				ValidateIssuer = true,
 				ValidateAudience = true,
 				ValidateLifetime = true,
-				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("OJGU6faPX0DuRf2j6OfdbiMwVAGNXZnK")),
-				ValidIssuer = "Template",
-				ValidAudience = "Template users"
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSettings?.key!)),
+				ValidIssuer = JwtSettings?.Issuer,
+				ValidAudience = JwtSettings?.Audience,
 			};
 		});
 
