@@ -23,7 +23,7 @@ public class JwtProvider : IJwtProvider
 			new(JwtRegisteredClaimNames.FamilyName, user.LastName),
 			new(JwtRegisteredClaimNames.Gender, user.Gender.ToString()),
 			new(JwtRegisteredClaimNames.Birthdate, user.DateOfBirth.ToString("yyyy-MM-dd")),
-			new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+			new(JwtRegisteredClaimNames.Jti , Guid.CreateVersion7().ToString()),
 		];
 
 		var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.key));
