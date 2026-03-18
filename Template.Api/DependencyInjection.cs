@@ -7,6 +7,7 @@ using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Reflection;
 using System.Text;
 using Template.Api.Authentication;
+using Template.Api.Services;
 
 namespace Template.Api;
 
@@ -22,6 +23,8 @@ public static class DependencyInjection
 		services.AddDbContext<ApplicationDbContext>(options =>
 			options.UseSqlServer(ConnectionString));
 
+
+		services.AddScoped<IAuthService, AuthService>();
 
 		services
 			.AddMapsterConfig()
