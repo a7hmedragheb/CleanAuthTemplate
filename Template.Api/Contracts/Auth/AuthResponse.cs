@@ -8,5 +8,7 @@ public record AuthResponse(
 	DateOnly DateOfBirth,
 	string Gender,
 	string Token,
-	int ExpiresIn
+	int ExpiresIn,
+	string RefreshToken,
+	DateTime RefreshTokenExpiration
 );
