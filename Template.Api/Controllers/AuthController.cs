@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Template.Api.Contracts.Auth;
 
 namespace Template.Api.Controllers;
 [Route("api/[controller]")]
