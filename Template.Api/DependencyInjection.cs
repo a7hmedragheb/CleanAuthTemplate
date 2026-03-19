@@ -1,7 +1,13 @@
 ﻿using FluentValidation;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Reflection;
+using System.Text;
+using Template.Api.Authentication;
+using Template.Api.Services;
 
 namespace Template.Api;
 
@@ -9,6 +15,8 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
 	{
+		services.AddControllers();
+
 		var ConnectionString = configuration.GetConnectionString("DefaultConnection") ??
 			throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -16,9 +24,12 @@ public static class DependencyInjection
 			options.UseSqlServer(ConnectionString));
 
 
-		services.AddControllers();
-		services.AddMapsterConfig();
-		services.AddFluentValidationConfig();
+		services.AddScoped<IAuthService, AuthService>();
+
+		services
+			.AddMapsterConfig()
+			.AddFluentValidationConfig()
+			.AddAuthorConfig(configuration);
 
 		return services;
 	}
@@ -39,6 +50,44 @@ public static class DependencyInjection
 		services
 			.AddFluentValidationAutoValidation()
 			.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+		return services;
+	}
+
+	private static IServiceCollection AddAuthorConfig(this IServiceCollection services, IConfiguration configuration)
+	{
+		services.AddIdentity<ApplicationUser, IdentityRole>()
+			.AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+		services.AddScoped<IJwtProvider, JwtProvider>();
+
+		services.AddOptions<JwtOptions>()
+			.BindConfiguration(JwtOptions.SectionName)
+			.ValidateDataAnnotations()
+			.ValidateOnStart();
+
+		var JwtSettings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
+
+		services.AddAuthentication(options =>
+		{
+			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+		})
+		.AddJwtBearer(o =>
+		{
+			o.SaveToken = true;
+			o.TokenValidationParameters = new TokenValidationParameters
+			{
+				ValidateIssuerSigningKey = true,
+				ValidateIssuer = true,
+				ValidateAudience = true,
+				ValidateLifetime = true,
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSettings?.key!)),
+				ValidIssuer = JwtSettings?.Issuer,
+				ValidAudience = JwtSettings?.Audience,
+			};
+		});
 
 		return services;
 	}
