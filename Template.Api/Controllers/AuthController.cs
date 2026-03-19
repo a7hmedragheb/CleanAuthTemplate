@@ -19,7 +19,15 @@ public class AuthController : ControllerBase
 	{
 		var authorResult = await _authService.GetTokenAsync(request.Email, request.Password, cancellationToken);
 
-		return authorResult is null ? BadRequest("Invalid email/password") : Ok(authorResult);
+		return authorResult.IsSuccess ? Ok(authorResult.Value) : authorResult.ToProblem();
+	}
+
+	[HttpPost("refresh")]
+	public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
+	{
+		var authorResult = await _authService.GetRefreshTokenAsync(request.Token, request.RefreshToken, cancellationToken);
+
+		return authorResult.IsSuccess ? Ok(authorResult.Value) : authorResult.ToProblem();
 	}
 
 }

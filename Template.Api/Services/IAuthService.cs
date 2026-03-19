@@ -1,8 +1,10 @@
-﻿using Template.Api.Contracts.Auth;
+﻿using Template.Api.Abstractions;
+using Template.Api.Contracts.Auth;
 
 namespace Template.Api.Services;
 
 public interface IAuthService
 {
-	Task<AuthResponse?> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default);
+	Task<Result<AuthResponse>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default);
+	Task<Result<AuthResponse>> GetRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default);
 }
