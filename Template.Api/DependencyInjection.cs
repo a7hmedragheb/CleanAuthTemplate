@@ -7,7 +7,6 @@ using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Reflection;
 using System.Text;
 using Template.Api.Authentication;
-using Template.Api.Services;
 
 namespace Template.Api;
 
@@ -26,10 +25,16 @@ public static class DependencyInjection
 
 		services.AddScoped<IAuthService, AuthService>();
 
+
+
 		services
 			.AddMapsterConfig()
 			.AddFluentValidationConfig()
 			.AddAuthorConfig(configuration);
+
+
+		services.AddExceptionHandler<GlobalExceptionHandler>();
+		services.AddProblemDetails();
 
 		return services;
 	}

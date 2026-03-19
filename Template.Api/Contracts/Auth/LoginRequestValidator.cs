@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Template.Api.Contracts;
+namespace Template.Api.Contracts.Auth;
 
 public class LoginRequestValidator : AbstractValidator<LoginRequest>
 {

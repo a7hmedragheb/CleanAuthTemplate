@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Template.Api.Authentication;
+using Template.Api.Contracts.Auth;
 
 namespace Template.Api.Services;
 

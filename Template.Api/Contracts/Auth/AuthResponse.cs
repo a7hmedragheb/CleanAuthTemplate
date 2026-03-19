@@ -1,4 +1,4 @@
-﻿namespace Template.Api.Contracts;
+﻿namespace Template.Api.Contracts.Auth;
 
 public record AuthResponse(
 	string Id,
