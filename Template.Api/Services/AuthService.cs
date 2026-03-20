@@ -108,6 +108,30 @@ public class AuthService : IAuthService
 		return Result.Success(response);
 	}
 
+	public async Task<Result> RevokeRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
+	{
+		var userId = _jwtProvider.ValidateToken(token);
+
+		if (userId is null)
+			return Result.Failure(UserErrors.InvalidJwtToken);
+
+		var user = await _userManager.FindByIdAsync(userId);
+
+		if (user is null)
+			return Result.Failure(UserErrors.InvalidJwtToken);
+
+		var userRefreshToken = user.RefreshTokens.SingleOrDefault(t => t.Token == refreshToken && t.IsActive);
+
+		if (userRefreshToken is null)
+			return Result.Failure(UserErrors.InvalidRefreshToken);
+
+		userRefreshToken.RevokedOn = DateTime.UtcNow;
+
+		await _userManager.UpdateAsync(user);
+
+		return Result.Success();
+	}
+
 	private static string GenerateRefreshToken()
 	{
 		var refreshToken = RandomNumberGenerator.GetBytes(64);
