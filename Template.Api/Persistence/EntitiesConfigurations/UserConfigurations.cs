@@ -20,5 +20,11 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 
 		builder.Property(u => u.Gender)
 			.IsRequired();
+
+		builder
+			.OwnsMany(u => u.RefreshTokens)
+			.ToTable("RefreshTokens")
+			.WithOwner()
+			.HasForeignKey("UserId");
 	}
 }
