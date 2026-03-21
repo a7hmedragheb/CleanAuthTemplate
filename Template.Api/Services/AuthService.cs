@@ -209,7 +209,7 @@ public class AuthService : IAuthService
 		var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 		var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-		var code = GenerateVerificationCode(5);
+		var code = GenerateVerificationCode();
 		var codeHash = ComputeSha256Hash(code + user.SecurityStamp);
 
 		var entity = new PasswordResetCode
@@ -217,9 +217,7 @@ public class AuthService : IAuthService
 			UserId = user.Id,
 			CodeHash = codeHash,
 			IdentityToken = encodedToken,
-			ExpiresAt = DateTime.UtcNow.AddMinutes(5),
-			CreatedAt = DateTime.UtcNow,
-			Used = false
+			ExpiresAt = DateTime.UtcNow.AddMinutes(ResetPasswordConsts.ExpiryMinutes),
 		};
 
 		_context.PasswordResetCodes.Add(entity);
@@ -234,35 +232,13 @@ public class AuthService : IAuthService
 
 	public async Task<Result> VerifyResetCodeAsync(string email, string code)
 	{
-		var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == email);
+		var (user, resetEntry) = await ValidateResetCodeAsync(email, code);
 
 		if (user is null)
 			return Result.Failure(UserErrors.InvalidCode);
 
-
-		var resetEntry = await _context.PasswordResetCodes
-		.Where(x => x.UserId == user.Id && !x.Used && x.ExpiresAt > DateTime.UtcNow)
-		.OrderByDescending(x => x.CreatedAt)
-		.FirstOrDefaultAsync();
-
-
 		if (resetEntry is null)
-			return Result.Failure(UserErrors.CodeReset);
-
-		var providedHash = ComputeSha256Hash(code + user.SecurityStamp);
-
-		if (!string.Equals(providedHash, resetEntry.CodeHash, StringComparison.Ordinal))
-		{
-			resetEntry.Attempts = (resetEntry.Attempts) + 1;
-			if (resetEntry.Attempts >= 3)
-			{
-				resetEntry.Used = true;
-			}
-
-			await _context.SaveChangesAsync();
-
-			return Result.Failure(UserErrors.CodeReset with { Description = "Invalid reset code" });
-		}
+			return Result.Failure(UserErrors.InvalidCode);
 
 		_logger.LogInformation("Password reset code verified for user {UserId}", user.Id);
 
@@ -271,36 +247,13 @@ public class AuthService : IAuthService
 
 	public async Task<Result> ResetPasswordAsync(string email, string code, string newPassword)
 	{
-		var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == email);
+		var (user, resetEntry) = await ValidateResetCodeAsync(email, code);
 
 		if (user is null)
 			return Result.Failure(UserErrors.InvalidCode);
 
-		var resetEntry = await _context.PasswordResetCodes
-			.Where(x => x.UserId == user.Id && !x.Used && x.ExpiresAt > DateTime.UtcNow)
-			.OrderByDescending(x => x.CreatedAt)
-			.FirstOrDefaultAsync();
-
 		if (resetEntry is null)
-			return Result.Failure(UserErrors.CodeReset);
-
-		var providedHash = ComputeSha256Hash(code + user.SecurityStamp);
-
-		if (!string.Equals(providedHash, resetEntry.CodeHash, StringComparison.Ordinal))
-		{
-			resetEntry.Attempts = (resetEntry.Attempts) + 1;
-
-			if (resetEntry.Attempts >= 3)
-				resetEntry.Used = true;
-
-			await _context.SaveChangesAsync();
-
-			return Result.Failure(UserErrors.CodeReset with { Description = "Invalid reset code" });
-		}
-
-		if (string.IsNullOrEmpty(resetEntry.IdentityToken))
-			return Result.Failure(UserErrors.CodeReset with { Description = "Reset token missing" });
-
+			return Result.Failure(UserErrors.InvalidCode);
 
 		string identityToken;
 		try
@@ -318,26 +271,51 @@ public class AuthService : IAuthService
 		if (!resetResult.Succeeded)
 		{
 			var error = resetResult.Errors.First();
-
 			return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 		}
 
-		resetEntry.Used = true;
-
-		var others = await _context.PasswordResetCodes
-			.Where(x => x.UserId == user.Id && !x.Used)
+		// Remove all old codes
+		var activeResetCodes = await _context.PasswordResetCodes
+			.Where(x => x.UserId == user.Id && !x.IsUsed)
 			.ToListAsync();
 
-		foreach (var o in others)
-			o.Used = true;
-
-		await _context.SaveChangesAsync();
+		foreach (var resetCode in activeResetCodes)
+			resetCode.UsedAt = DateTime.UtcNow;
 
 		await _userManager.UpdateSecurityStampAsync(user);
+		await _context.SaveChangesAsync();
 
 		_logger.LogInformation("Password reset completed for user {UserId}", user.Id);
 		return Result.Success();
 	}
+
+	private async Task<(ApplicationUser? User, PasswordResetCode? ResetEntry)> ValidateResetCodeAsync(string email, string code)
+	{
+		var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == email);
+		if (user is null) return (null, null);
+
+		var resetEntry = await _context.PasswordResetCodes
+			.Where(x => x.UserId == user.Id && !x.IsUsed && x.ExpiresAt > DateTime.UtcNow)
+			.OrderByDescending(x => x.CreatedAt)
+			.FirstOrDefaultAsync();
+
+		if (resetEntry is null) return (user, null);
+
+		var providedHash = ComputeSha256Hash(code + user.SecurityStamp);
+
+		if (!string.Equals(providedHash, resetEntry.CodeHash, StringComparison.Ordinal))
+		{
+			resetEntry.Attempts++;
+			if (resetEntry.Attempts >= ResetPasswordConsts.MaxAttempts)
+				resetEntry.UsedAt = DateTime.UtcNow;
+
+			await _context.SaveChangesAsync();
+			return (user, null);
+		}
+
+		return (user, resetEntry);
+	}
+
 
 	private static string GenerateRefreshToken()
 	{
@@ -350,22 +328,23 @@ public class AuthService : IAuthService
 
 	private static string GenerateVerificationCode(int length = 6)
 	{
-		var code = new char[length];
+		var codeDigits = new char[length];
 
 		do
 		{
-			var random = RandomNumberGenerator.GetBytes(length);
-			
+			var randomBytes = RandomNumberGenerator.GetBytes(length);
+
 			for (int i = 0; i < length; i++)
 			{
-				if (random[i] < 256 - (256 % _allowedNumber.Length))
-					code[i] = _allowedNumber[random[i] % _allowedNumber.Length];
+				if (randomBytes[i] < 256 - (256 % _allowedNumber.Length))
+					codeDigits[i] = _allowedNumber[randomBytes[i] % _allowedNumber.Length];
 			}
 
-		} while (code.Contains('\0'));
+		} while (codeDigits.Contains('\0'));
 
-		return new string(code);
+		return new string(codeDigits);
 	}
+
 	private static string ComputeSha256Hash(string input)
 	{
 		var bytes = Encoding.UTF8.GetBytes(input);
