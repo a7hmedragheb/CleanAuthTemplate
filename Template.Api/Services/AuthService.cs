@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
+using System.Text;
 using Template.Api.Authentication;
 using Template.Api.Contracts.Auth;
 
@@ -7,14 +10,21 @@ namespace Template.Api.Services;
 
 public class AuthService : IAuthService
 {
-
+	private readonly ApplicationDbContext _context;
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IJwtProvider _jwtProvider;
+	private readonly ILogger<AuthService> _logger;
+
 	private readonly int _refreshTokenExpiryDays = 14;
-	public AuthService(UserManager<ApplicationUser> userManager, IJwtProvider jwtProvider)
+	public AuthService(ApplicationDbContext context,
+			UserManager<ApplicationUser> userManager,
+			IJwtProvider jwtProvider,
+			ILogger<AuthService> logger)
 	{
+		_context = context;
 		_userManager = userManager;
 		_jwtProvider = jwtProvider;
+		_logger = logger;
 	}
 
 	public async Task<Result<AuthResult>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
@@ -59,20 +69,6 @@ public class AuthService : IAuthService
 			refreshTokenExpiration
 		);
 
-		//var response = new AuthResponse(
-		//	user.Id,
-		//	user.Email,
-		//	user.FirstName,
-		//	user.LastName,
-		//	user.PhoneNumber,
-		//	DateOnly.FromDateTime(user.DateOfBirth),
-		//	user.Gender.ToString(),
-		//	token,
-		//	expiresIn,
-		//	refreshToken,
-		//	refreshTokenExpiration
-		//);
-
 		return Result.Success(response);
 	}
 
@@ -107,20 +103,6 @@ public class AuthService : IAuthService
 		});
 
 		await _userManager.UpdateAsync(user);
-
-		//var response = new AuthResponse(
-		//	user.Id,
-		//	user.Email,
-		//	user.FirstName,
-		//	user.LastName,
-		//	user.PhoneNumber,
-		//	DateOnly.FromDateTime(user.DateOfBirth),
-		//	user.Gender.ToString(),
-		//	newToken,
-		//	expiresIn,
-		//	newRefreshToken,
-		//	refreshTokenExpiration
-		//);
 
 		var response = new AuthResult(
 			new AuthResponse(
@@ -195,21 +177,6 @@ public class AuthService : IAuthService
 
 			await _userManager.UpdateAsync(user);
 
-
-			//var response = new AuthResponse(
-			//	user.Id,
-			//	user.Email,
-			//	user.FirstName,
-			//	user.LastName,
-			//	user.PhoneNumber,
-			//	DateOnly.FromDateTime(user.DateOfBirth),
-			//	user.Gender.ToString(),
-			//	token,
-			//	expiresIn,
-			//	refreshToken,
-			//	refreshTokenExpiration
-			//);
-
 			var response = new AuthResult(
 				new AuthResponse(
 					user.Id,
@@ -234,10 +201,66 @@ public class AuthService : IAuthService
 		return Result.Failure<AuthResult>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 	}
 
+	public async Task<Result> SendResetPasswordCodeAsync(string email)
+	{
+		if (await _userManager.FindByEmailAsync(email) is not { } user)
+			return Result.Success();
+
+		var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+		var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+		var code = GenerateVerificationCode(5);
+		var codeHash = ComputeSha256Hash(code + user.SecurityStamp);
+
+		var entity = new PasswordResetCode
+		{
+			UserId = user.Id,
+			CodeHash = codeHash,
+			IdentityToken = encodedToken,
+			ExpiresAt = DateTime.UtcNow.AddMinutes(5),
+			CreatedAt = DateTime.UtcNow,
+			Used = false
+		};
+
+		_context.PasswordResetCodes.Add(entity);
+		await _context.SaveChangesAsync();
+
+		_logger.LogInformation("Password reset code for {Email}: {Code} expires {Expiry}", user.Email, code, entity.ExpiresAt);
+
+		// TODO: send email with 'code' (do not log in production)
+
+		return Result.Success();
+	}
+
 	private static string GenerateRefreshToken()
 	{
 		var refreshToken = RandomNumberGenerator.GetBytes(64);
 
 		return Convert.ToBase64String(refreshToken);
+	}
+
+	public static readonly char[] _allowedNumber = "0123456789".ToCharArray();
+
+	private static string GenerateVerificationCode(int length = 5)
+	{
+		var chars = new char[length];
+
+		do
+		{
+			var bytes = RandomNumberGenerator.GetBytes(length);
+			for (int i = 0; i < length; i++)
+			{
+				if (bytes[i] < 256 - (256 % _allowedNumber.Length))
+					chars[i] = _allowedNumber[bytes[i] % _allowedNumber.Length];
+			}
+		} while (chars.Contains('\0'));
+
+		return new string(chars);
+	}
+	private static string ComputeSha256Hash(string input)
+	{
+		var bytes = Encoding.UTF8.GetBytes(input);
+		var hashed = SHA256.HashData(bytes);
+		return Convert.ToBase64String(hashed);
 	}
 }
