@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Template.Api.Abstractions.Consts;
 
 namespace Template.Api.Contracts.Auth;
 
@@ -12,7 +13,9 @@ public class VerifyResetCodeRequestValidator : AbstractValidator<VerifyResetCode
 
 		RuleFor(x => x.Code)
 			.NotEmpty()
-			.MaximumLength(6);
+			.Length(5)
+			.Matches(RegexPatterns.NumbersOnly)
+			.WithMessage("Code must be 6 numbers only.");
 	}
 }
 

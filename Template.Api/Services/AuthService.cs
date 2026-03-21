@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
+using Template.Api.Abstractions.Consts;
 using Template.Api.Authentication;
 using Template.Api.Contracts.Auth;
 
@@ -346,23 +346,25 @@ public class AuthService : IAuthService
 		return Convert.ToBase64String(refreshToken);
 	}
 
-	public static readonly char[] _allowedNumber = "0123456789".ToCharArray();
+	public static readonly char[] _allowedNumber = AllowedNumber._allowedNumber;
 
-	private static string GenerateVerificationCode(int length = 5)
+	private static string GenerateVerificationCode(int length = 6)
 	{
-		var chars = new char[length];
+		var code = new char[length];
 
 		do
 		{
-			var bytes = RandomNumberGenerator.GetBytes(length);
+			var random = RandomNumberGenerator.GetBytes(length);
+			
 			for (int i = 0; i < length; i++)
 			{
-				if (bytes[i] < 256 - (256 % _allowedNumber.Length))
-					chars[i] = _allowedNumber[bytes[i] % _allowedNumber.Length];
+				if (random[i] < 256 - (256 % _allowedNumber.Length))
+					code[i] = _allowedNumber[random[i] % _allowedNumber.Length];
 			}
-		} while (chars.Contains('\0'));
 
-		return new string(chars);
+		} while (code.Contains('\0'));
+
+		return new string(code);
 	}
 	private static string ComputeSha256Hash(string input)
 	{

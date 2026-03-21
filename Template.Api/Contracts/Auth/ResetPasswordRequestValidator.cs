@@ -12,7 +12,9 @@ public class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequ
 
 		RuleFor(x => x.Code)
 			.NotEmpty()
-			.MaximumLength(6);
+			.Length(5)
+			.Matches(RegexPatterns.NumbersOnly)
+			.WithMessage("Code must be 6 numbers only.");
 
 		RuleFor(x => x.NewPassword)
 				.NotEmpty()
