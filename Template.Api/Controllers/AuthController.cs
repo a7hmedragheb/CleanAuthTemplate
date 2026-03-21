@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Template.Api.Abstractions.Consts;
 using Template.Api.Contracts.Auth;
 
 namespace Template.Api.Controllers;
@@ -28,14 +29,14 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("refresh")]
-	public async Task<IActionResult> RefreshAsync(CancellationToken cancellationToken)
+	public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
 	{
 		var result = await _authService.GetRefreshTokenAsync(GetTokenFromHeader(), GetRefreshTokenFromCookie()!, cancellationToken);
 
 		if (result.IsSuccess)
 		{
 			SetRefreshTokenInCookie(result.Value.RefreshToken, result.Value.RefreshTokenExpiration);
-			return Ok(result.Value.Response); 
+			return Ok(result.Value.Response);
 		}
 
 		return result.ToProblem();
@@ -49,7 +50,7 @@ public class AuthController : ControllerBase
 
 		if (result.IsSuccess)
 		{
-			Response.Cookies.Delete("refreshToken");
+			Response.Cookies.Delete(CookieKeys.RefreshToken);
 			return Ok();
 		}
 
@@ -80,12 +81,12 @@ public class AuthController : ControllerBase
 			Expires = expires.ToLocalTime()
 		};
 
-		Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+		Response.Cookies.Append(CookieKeys.RefreshToken, refreshToken, cookieOptions);
 	}
 
 	private string? GetRefreshTokenFromCookie()
-		=> Request.Cookies["refreshToken"];
+		=> Request.Cookies[CookieKeys.RefreshToken];
 
 	private string GetTokenFromHeader()
-		=> Request.Headers.Authorization.ToString().Replace("Bearer ", "");
+		=> Request.Headers.Authorization.ToString().Replace(HeaderKeys.Authorization, "");
 }
