@@ -5,7 +5,7 @@ public record AuthResponse(
 	string? Email,
 	string FirstName,
 	string LastName,
-	string PhoneNumber,
+	string? PhoneNumber,
 	DateOnly DateOfBirth,
 	string Gender,
 	string Token,
