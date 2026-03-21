@@ -134,6 +134,60 @@ public class AuthService : IAuthService
 		return Result.Success();
 	}
 
+	public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+	{
+		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
+
+		if (emailIsExists)
+			return Result.Failure<AuthResponse>(UserErrors.DuplicatedEmail);
+
+		var phoneNumberIsExists = await _userManager.Users.AnyAsync(x => x.PhoneNumber == request.PhoneNumber, cancellationToken);
+
+		if (phoneNumberIsExists)
+			return Result.Failure<AuthResponse>(UserErrors.DuplicatedPhoneNumber);
+
+		var user = request.Adapt<ApplicationUser>();
+
+		var result = await _userManager.CreateAsync(user, request.Password);
+
+		if (result.Succeeded)
+		{
+			var (token, expiresIn) = _jwtProvider.GenerateToken(user);
+			var refreshToken = GenerateRefreshToken();
+			var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
+
+			user.RefreshTokens.Add(new RefreshToken
+			{
+				Token = refreshToken,
+				ExpiresOn = refreshTokenExpiration
+			});
+
+			await _userManager.UpdateAsync(user);
+
+
+			var response = new AuthResponse(
+				user.Id,
+				user.Email,
+				user.FirstName,
+				user.LastName,
+				user.PhoneNumber,
+				DateOnly.FromDateTime(user.DateOfBirth),
+				user.Gender.ToString(),
+				token,
+				expiresIn,
+				refreshToken,
+				refreshTokenExpiration
+			);
+
+			return Result.Success(response);
+		}
+
+		var error = result.Errors.First();
+
+		return Result.Failure<AuthResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+	}
+
+
 	private static string GenerateRefreshToken()
 	{
 		var refreshToken = RandomNumberGenerator.GetBytes(64);
