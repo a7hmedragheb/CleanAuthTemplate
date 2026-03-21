@@ -232,6 +232,44 @@ public class AuthService : IAuthService
 		return Result.Success();
 	}
 
+	public async Task<Result> VerifyResetCodeAsync(string email, string code)
+	{
+		var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == email);
+
+		if (user is null)
+			return Result.Failure(UserErrors.InvalidCode);
+
+
+		var resetEntry = await _context.PasswordResetCodes
+		.Where(x => x.UserId == user.Id && !x.Used && x.ExpiresAt > DateTime.UtcNow)
+		.OrderByDescending(x => x.CreatedAt)
+		.FirstOrDefaultAsync();
+
+
+		if (resetEntry is null)
+			return Result.Failure(UserErrors.CodeReset);
+
+		var providedHash = ComputeSha256Hash(code + user.SecurityStamp);
+
+		if (!string.Equals(providedHash, resetEntry.CodeHash, StringComparison.Ordinal))
+		{
+			resetEntry.Attempts = (resetEntry.Attempts) + 1;
+			if (resetEntry.Attempts >= 3)
+			{
+				resetEntry.Used = true;
+			}
+
+			await _context.SaveChangesAsync();
+
+			return Result.Failure(UserErrors.CodeReset with { Description = "Invalid reset code" });
+		}
+
+		_logger.LogInformation("Password reset code verified for user {UserId}", user.Id);
+
+		return Result.Success();
+	}
+
+
 	private static string GenerateRefreshToken()
 	{
 		var refreshToken = RandomNumberGenerator.GetBytes(64);
