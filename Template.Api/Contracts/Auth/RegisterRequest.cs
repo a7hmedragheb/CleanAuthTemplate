@@ -6,7 +6,7 @@ public record RegisterRequest(
 	string LastName,
 	string PhoneNumber,
 	DateOnly DateOfBirth,
-	string Gender,
+	Gender Gender,
 	string Password,
 	string ConfirmPassword
 );

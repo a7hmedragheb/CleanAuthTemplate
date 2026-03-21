@@ -2,6 +2,6 @@
 
 
 public record RefreshTokenRequest(
-	string Token,
+	string Token,	
 	string RefreshToken
 );

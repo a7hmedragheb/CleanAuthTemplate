@@ -9,7 +9,13 @@ public record AuthResponse(
 	DateOnly DateOfBirth,
 	string Gender,
 	string Token,
-	int ExpiresIn,
+	int ExpiresIn
+	//string RefreshToken,
+	//DateTime RefreshTokenExpiration
+);
+
+public record AuthResult(
+	AuthResponse Response,
 	string RefreshToken,
 	DateTime RefreshTokenExpiration
 );

@@ -17,17 +17,17 @@ public class AuthService : IAuthService
 		_jwtProvider = jwtProvider;
 	}
 
-	public async Task<Result<AuthResponse>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
+	public async Task<Result<AuthResult>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
 	{
 		var user = await _userManager.FindByEmailAsync(email);
 
 		if (user is null)
-			return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
+			return Result.Failure<AuthResult>(UserErrors.InvalidCredentials);
 
 		var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
 
 		if (!isPasswordValid)
-			return Result.Failure<AuthResponse>(UserErrors.InvalidCredentials);
+			return Result.Failure<AuthResult>(UserErrors.InvalidCredentials);
 
 		var (token, expiresIn) = _jwtProvider.GenerateToken(user);
 
@@ -43,40 +43,55 @@ public class AuthService : IAuthService
 
 		await _userManager.UpdateAsync(user);
 
-
-		var response = new AuthResponse(
-			user.Id,
-			user.Email,
-			user.FirstName,
-			user.LastName,
-			user.PhoneNumber,
-			DateOnly.FromDateTime(user.DateOfBirth),
-			user.Gender.ToString(),
-			token,
-			expiresIn,
+		var response = new AuthResult(
+			new AuthResponse(
+				user.Id,
+				user.Email,
+				user.FirstName,
+				user.LastName,
+				user.PhoneNumber,
+				DateOnly.FromDateTime(user.DateOfBirth),
+				user.Gender.ToString(),
+				token,
+				expiresIn
+			),
 			refreshToken,
 			refreshTokenExpiration
 		);
 
+		//var response = new AuthResponse(
+		//	user.Id,
+		//	user.Email,
+		//	user.FirstName,
+		//	user.LastName,
+		//	user.PhoneNumber,
+		//	DateOnly.FromDateTime(user.DateOfBirth),
+		//	user.Gender.ToString(),
+		//	token,
+		//	expiresIn,
+		//	refreshToken,
+		//	refreshTokenExpiration
+		//);
+
 		return Result.Success(response);
 	}
 
-	public async Task<Result<AuthResponse>> GetRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
+	public async Task<Result<AuthResult>> GetRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
 	{
 		var userId = _jwtProvider.ValidateToken(token);
 
 		if (userId is null)
-			return Result.Failure<AuthResponse>(UserErrors.InvalidJwtToken);
+			return Result.Failure<AuthResult>(UserErrors.InvalidJwtToken);
 
 		var user = await _userManager.FindByIdAsync(userId);
 
 		if (user is null)
-			return Result.Failure<AuthResponse>(UserErrors.InvalidJwtToken);
+			return Result.Failure<AuthResult>(UserErrors.InvalidJwtToken);
 
 		var userRefreshToken = user.RefreshTokens.SingleOrDefault(t => t.Token == refreshToken && t.IsActive);
 
 		if (userRefreshToken is null)
-			return Result.Failure<AuthResponse>(UserErrors.InvalidRefreshToken);
+			return Result.Failure<AuthResult>(UserErrors.InvalidRefreshToken);
 
 
 		userRefreshToken.RevokedOn = DateTime.UtcNow;
@@ -93,16 +108,32 @@ public class AuthService : IAuthService
 
 		await _userManager.UpdateAsync(user);
 
-		var response = new AuthResponse(
-			user.Id,
-			user.Email,
-			user.FirstName,
-			user.LastName,
-			user.PhoneNumber,
-			DateOnly.FromDateTime(user.DateOfBirth),
-			user.Gender.ToString(),
-			newToken,
-			expiresIn,
+		//var response = new AuthResponse(
+		//	user.Id,
+		//	user.Email,
+		//	user.FirstName,
+		//	user.LastName,
+		//	user.PhoneNumber,
+		//	DateOnly.FromDateTime(user.DateOfBirth),
+		//	user.Gender.ToString(),
+		//	newToken,
+		//	expiresIn,
+		//	newRefreshToken,
+		//	refreshTokenExpiration
+		//);
+
+		var response = new AuthResult(
+			new AuthResponse(
+				user.Id,
+				user.Email,
+				user.FirstName,
+				user.LastName,
+				user.PhoneNumber,
+				DateOnly.FromDateTime(user.DateOfBirth),
+				user.Gender.ToString(),
+				newToken,
+				expiresIn
+			),
 			newRefreshToken,
 			refreshTokenExpiration
 		);
@@ -134,17 +165,17 @@ public class AuthService : IAuthService
 		return Result.Success();
 	}
 
-	public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+	public async Task<Result<AuthResult>> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
 	{
 		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
 
 		if (emailIsExists)
-			return Result.Failure<AuthResponse>(UserErrors.DuplicatedEmail);
+			return Result.Failure<AuthResult>(UserErrors.DuplicatedEmail);
 
 		var phoneNumberIsExists = await _userManager.Users.AnyAsync(x => x.PhoneNumber == request.PhoneNumber, cancellationToken);
 
 		if (phoneNumberIsExists)
-			return Result.Failure<AuthResponse>(UserErrors.DuplicatedPhoneNumber);
+			return Result.Failure<AuthResult>(UserErrors.DuplicatedPhoneNumber);
 
 		var user = request.Adapt<ApplicationUser>();
 
@@ -165,16 +196,32 @@ public class AuthService : IAuthService
 			await _userManager.UpdateAsync(user);
 
 
-			var response = new AuthResponse(
-				user.Id,
-				user.Email,
-				user.FirstName,
-				user.LastName,
-				user.PhoneNumber,
-				DateOnly.FromDateTime(user.DateOfBirth),
-				user.Gender.ToString(),
-				token,
-				expiresIn,
+			//var response = new AuthResponse(
+			//	user.Id,
+			//	user.Email,
+			//	user.FirstName,
+			//	user.LastName,
+			//	user.PhoneNumber,
+			//	DateOnly.FromDateTime(user.DateOfBirth),
+			//	user.Gender.ToString(),
+			//	token,
+			//	expiresIn,
+			//	refreshToken,
+			//	refreshTokenExpiration
+			//);
+
+			var response = new AuthResult(
+				new AuthResponse(
+					user.Id,
+					user.Email,
+					user.FirstName,
+					user.LastName,
+					user.PhoneNumber,
+					DateOnly.FromDateTime(user.DateOfBirth),
+					user.Gender.ToString(),
+					token,
+					expiresIn
+				),
 				refreshToken,
 				refreshTokenExpiration
 			);
@@ -184,9 +231,8 @@ public class AuthService : IAuthService
 
 		var error = result.Errors.First();
 
-		return Result.Failure<AuthResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+		return Result.Failure<AuthResult>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 	}
-
 
 	private static string GenerateRefreshToken()
 	{
