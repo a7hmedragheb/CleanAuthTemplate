@@ -276,7 +276,7 @@ public class AuthService : IAuthService
 
 		// Remove all old codes
 		var activeResetCodes = await _context.PasswordResetCodes
-			.Where(x => x.UserId == user.Id && !x.IsUsed)
+			.Where(x => x.UserId == user.Id && x.UsedAt == null)	
 			.ToListAsync();
 
 		foreach (var resetCode in activeResetCodes)
@@ -295,7 +295,7 @@ public class AuthService : IAuthService
 		if (user is null) return (null, null);
 
 		var resetEntry = await _context.PasswordResetCodes
-			.Where(x => x.UserId == user.Id && !x.IsUsed && x.ExpiresAt > DateTime.UtcNow)
+			.Where(x => x.UserId == user.Id && x.UsedAt == null && x.ExpiresAt > DateTime.UtcNow)
 			.OrderByDescending(x => x.CreatedAt)
 			.FirstOrDefaultAsync();
 
@@ -315,7 +315,6 @@ public class AuthService : IAuthService
 
 		return (user, resetEntry);
 	}
-
 
 	private static string GenerateRefreshToken()
 	{

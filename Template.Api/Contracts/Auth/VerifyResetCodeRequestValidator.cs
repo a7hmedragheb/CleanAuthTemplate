@@ -13,7 +13,7 @@ public class VerifyResetCodeRequestValidator : AbstractValidator<VerifyResetCode
 
 		RuleFor(x => x.Code)
 			.NotEmpty()
-			.Length(5)
+			.Length(6)
 			.Matches(RegexPatterns.NumbersOnly)
 			.WithMessage("Code must be 6 numbers only.");
 	}
