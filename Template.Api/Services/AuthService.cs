@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using System.Security.Cryptography;
+using System.Text;
+using Template.Api.Abstractions.Consts;
 using Template.Api.Authentication;
 using Template.Api.Contracts.Auth;
 
@@ -7,14 +10,21 @@ namespace Template.Api.Services;
 
 public class AuthService : IAuthService
 {
-
+	private readonly ApplicationDbContext _context;
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IJwtProvider _jwtProvider;
+	private readonly ILogger<AuthService> _logger;
+
 	private readonly int _refreshTokenExpiryDays = 14;
-	public AuthService(UserManager<ApplicationUser> userManager, IJwtProvider jwtProvider)
+	public AuthService(ApplicationDbContext context,
+			UserManager<ApplicationUser> userManager,
+			IJwtProvider jwtProvider,
+			ILogger<AuthService> logger)
 	{
+		_context = context;
 		_userManager = userManager;
 		_jwtProvider = jwtProvider;
+		_logger = logger;
 	}
 
 	public async Task<Result<AuthResult>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
@@ -59,20 +69,6 @@ public class AuthService : IAuthService
 			refreshTokenExpiration
 		);
 
-		//var response = new AuthResponse(
-		//	user.Id,
-		//	user.Email,
-		//	user.FirstName,
-		//	user.LastName,
-		//	user.PhoneNumber,
-		//	DateOnly.FromDateTime(user.DateOfBirth),
-		//	user.Gender.ToString(),
-		//	token,
-		//	expiresIn,
-		//	refreshToken,
-		//	refreshTokenExpiration
-		//);
-
 		return Result.Success(response);
 	}
 
@@ -107,20 +103,6 @@ public class AuthService : IAuthService
 		});
 
 		await _userManager.UpdateAsync(user);
-
-		//var response = new AuthResponse(
-		//	user.Id,
-		//	user.Email,
-		//	user.FirstName,
-		//	user.LastName,
-		//	user.PhoneNumber,
-		//	DateOnly.FromDateTime(user.DateOfBirth),
-		//	user.Gender.ToString(),
-		//	newToken,
-		//	expiresIn,
-		//	newRefreshToken,
-		//	refreshTokenExpiration
-		//);
 
 		var response = new AuthResult(
 			new AuthResponse(
@@ -195,21 +177,6 @@ public class AuthService : IAuthService
 
 			await _userManager.UpdateAsync(user);
 
-
-			//var response = new AuthResponse(
-			//	user.Id,
-			//	user.Email,
-			//	user.FirstName,
-			//	user.LastName,
-			//	user.PhoneNumber,
-			//	DateOnly.FromDateTime(user.DateOfBirth),
-			//	user.Gender.ToString(),
-			//	token,
-			//	expiresIn,
-			//	refreshToken,
-			//	refreshTokenExpiration
-			//);
-
 			var response = new AuthResult(
 				new AuthResponse(
 					user.Id,
@@ -234,10 +201,153 @@ public class AuthService : IAuthService
 		return Result.Failure<AuthResult>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 	}
 
+	public async Task<Result> SendResetPasswordCodeAsync(string email)
+	{
+		if (await _userManager.FindByEmailAsync(email) is not { } user)
+			return Result.Success();
+
+		var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+		var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+		var code = GenerateVerificationCode();
+		var codeHash = ComputeSha256Hash(code + user.SecurityStamp);
+
+		var entity = new PasswordResetCode
+		{
+			UserId = user.Id,
+			CodeHash = codeHash,
+			IdentityToken = encodedToken,
+			ExpiresAt = DateTime.UtcNow.AddMinutes(ResetPasswordConsts.ExpiryMinutes),
+		};
+
+		_context.PasswordResetCodes.Add(entity);
+		await _context.SaveChangesAsync();
+
+		_logger.LogInformation("Password reset code for {Email}: {Code} expires {Expiry}", user.Email, code, entity.ExpiresAt);
+
+		// TODO: send email with 'code' (do not log in production)
+
+		return Result.Success();
+	}
+
+	public async Task<Result> VerifyResetCodeAsync(string email, string code)
+	{
+		var (user, resetEntry) = await ValidateResetCodeAsync(email, code);
+
+		if (user is null)
+			return Result.Failure(UserErrors.InvalidCode);
+
+		if (resetEntry is null)
+			return Result.Failure(UserErrors.InvalidCode);
+
+		_logger.LogInformation("Password reset code verified for user {UserId}", user.Id);
+
+		return Result.Success();
+	}
+
+	public async Task<Result> ResetPasswordAsync(string email, string code, string newPassword)
+	{
+		var (user, resetEntry) = await ValidateResetCodeAsync(email, code);
+
+		if (user is null)
+			return Result.Failure(UserErrors.InvalidCode);
+
+		if (resetEntry is null)
+			return Result.Failure(UserErrors.InvalidCode);
+
+		string identityToken;
+		try
+		{
+			var tokenBytes = WebEncoders.Base64UrlDecode(resetEntry.IdentityToken);
+			identityToken = Encoding.UTF8.GetString(tokenBytes);
+		}
+		catch
+		{
+			return Result.Failure(UserErrors.CodeReset with { Description = "Malformed reset token" });
+		}
+
+		var resetResult = await _userManager.ResetPasswordAsync(user, identityToken, newPassword);
+
+		if (!resetResult.Succeeded)
+		{
+			var error = resetResult.Errors.First();
+			return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+		}
+
+		// Remove all old codes
+		var activeResetCodes = await _context.PasswordResetCodes
+			.Where(x => x.UserId == user.Id && x.UsedAt == null)	
+			.ToListAsync();
+
+		foreach (var resetCode in activeResetCodes)
+			resetCode.UsedAt = DateTime.UtcNow;
+
+		await _userManager.UpdateSecurityStampAsync(user);
+		await _context.SaveChangesAsync();
+
+		_logger.LogInformation("Password reset completed for user {UserId}", user.Id);
+		return Result.Success();
+	}
+
+	private async Task<(ApplicationUser? User, PasswordResetCode? ResetEntry)> ValidateResetCodeAsync(string email, string code)
+	{
+		var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == email);
+		if (user is null) return (null, null);
+
+		var resetEntry = await _context.PasswordResetCodes
+			.Where(x => x.UserId == user.Id && x.UsedAt == null && x.ExpiresAt > DateTime.UtcNow)
+			.OrderByDescending(x => x.CreatedAt)
+			.FirstOrDefaultAsync();
+
+		if (resetEntry is null) return (user, null);
+
+		var providedHash = ComputeSha256Hash(code + user.SecurityStamp);
+
+		if (!string.Equals(providedHash, resetEntry.CodeHash, StringComparison.Ordinal))
+		{
+			resetEntry.Attempts++;
+			if (resetEntry.Attempts >= ResetPasswordConsts.MaxAttempts)
+				resetEntry.UsedAt = DateTime.UtcNow;
+
+			await _context.SaveChangesAsync();
+			return (user, null);
+		}
+
+		return (user, resetEntry);
+	}
+
 	private static string GenerateRefreshToken()
 	{
 		var refreshToken = RandomNumberGenerator.GetBytes(64);
 
 		return Convert.ToBase64String(refreshToken);
+	}
+
+	public static readonly char[] _allowedNumber = AllowedNumber._allowedNumber;
+
+	private static string GenerateVerificationCode(int length = 6)
+	{
+		var codeDigits = new char[length];
+
+		do
+		{
+			var randomBytes = RandomNumberGenerator.GetBytes(length);
+
+			for (int i = 0; i < length; i++)
+			{
+				if (randomBytes[i] < 256 - (256 % _allowedNumber.Length))
+					codeDigits[i] = _allowedNumber[randomBytes[i] % _allowedNumber.Length];
+			}
+
+		} while (codeDigits.Contains('\0'));
+
+		return new string(codeDigits);
+	}
+
+	private static string ComputeSha256Hash(string input)
+	{
+		var bytes = Encoding.UTF8.GetBytes(input);
+		var hashed = SHA256.HashData(bytes);
+		return Convert.ToBase64String(hashed);
 	}
 }
