@@ -269,6 +269,75 @@ public class AuthService : IAuthService
 		return Result.Success();
 	}
 
+	public async Task<Result> ResetPasswordAsync(string email, string code, string newPassword)
+	{
+		var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == email);
+
+		if (user is null)
+			return Result.Failure(UserErrors.InvalidCode);
+
+		var resetEntry = await _context.PasswordResetCodes
+			.Where(x => x.UserId == user.Id && !x.Used && x.ExpiresAt > DateTime.UtcNow)
+			.OrderByDescending(x => x.CreatedAt)
+			.FirstOrDefaultAsync();
+
+		if (resetEntry is null)
+			return Result.Failure(UserErrors.CodeReset);
+
+		var providedHash = ComputeSha256Hash(code + user.SecurityStamp);
+
+		if (!string.Equals(providedHash, resetEntry.CodeHash, StringComparison.Ordinal))
+		{
+			resetEntry.Attempts = (resetEntry.Attempts) + 1;
+
+			if (resetEntry.Attempts >= 3)
+				resetEntry.Used = true;
+
+			await _context.SaveChangesAsync();
+
+			return Result.Failure(UserErrors.CodeReset with { Description = "Invalid reset code" });
+		}
+
+		if (string.IsNullOrEmpty(resetEntry.IdentityToken))
+			return Result.Failure(UserErrors.CodeReset with { Description = "Reset token missing" });
+
+
+		string identityToken;
+		try
+		{
+			var tokenBytes = WebEncoders.Base64UrlDecode(resetEntry.IdentityToken);
+			identityToken = Encoding.UTF8.GetString(tokenBytes);
+		}
+		catch
+		{
+			return Result.Failure(UserErrors.CodeReset with { Description = "Malformed reset token" });
+		}
+
+		var resetResult = await _userManager.ResetPasswordAsync(user, identityToken, newPassword);
+
+		if (!resetResult.Succeeded)
+		{
+			var error = resetResult.Errors.First();
+
+			return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+		}
+
+		resetEntry.Used = true;
+
+		var others = await _context.PasswordResetCodes
+			.Where(x => x.UserId == user.Id && !x.Used)
+			.ToListAsync();
+
+		foreach (var o in others)
+			o.Used = true;
+
+		await _context.SaveChangesAsync();
+
+		await _userManager.UpdateSecurityStampAsync(user);
+
+		_logger.LogInformation("Password reset completed for user {UserId}", user.Id);
+		return Result.Success();
+	}
 
 	private static string GenerateRefreshToken()
 	{
