@@ -22,9 +22,11 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 					.Matches(RegexPatterns.CharactersOnly_Eng)
 					.WithMessage("Only English letters are allowed.");
 
+
 		RuleFor(x => x.Gender)
-					.IsInEnum()
-					.WithMessage("Invalid gender value.");
+						.IsInEnum()
+						.WithMessage("Invalid gender value. Please choose: 0 for Male or 1 for Female.");
+
 
 		RuleFor(x => x.PhoneNumber)
 					.NotEmpty()
