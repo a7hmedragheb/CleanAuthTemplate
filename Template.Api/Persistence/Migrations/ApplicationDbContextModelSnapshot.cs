@@ -293,7 +293,7 @@ namespace Template.Api.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PasswordResetCodes");
+                    b.ToTable("PasswordResetCodes", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

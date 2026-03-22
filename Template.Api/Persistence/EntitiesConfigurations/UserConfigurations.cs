@@ -39,5 +39,8 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 			.HasDefaultValue(false);
 
 		builder.Property(u => u.DeletedAt);
+
+		// Global Filter for disappear Deleted Users Query Results
+		builder.HasQueryFilter(u => !u.IsDeleted);
 	}
 }

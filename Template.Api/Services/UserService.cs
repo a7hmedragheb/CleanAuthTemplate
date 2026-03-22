@@ -7,10 +7,10 @@ namespace Template.Api.Services;
 public class UserService : IUserService
 {
 	private readonly UserManager<ApplicationUser> _userManager;
-	private readonly ILogger<AuthService> _logger;
+	private readonly ILogger<UserService> _logger;
 	private readonly IEmailSender _emailSender;
 	public UserService(UserManager<ApplicationUser> userManager,
-		ILogger<AuthService> logger,
+		ILogger<UserService> logger,
 		IEmailSender emailSender)
 	{
 		_userManager = userManager;

@@ -82,7 +82,11 @@ public class AuthService : IAuthService
 		if (userId is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidJwtToken);
 
-		var user = await _userManager.FindByIdAsync(userId);
+      // var user = await _userManager.FindByIdAsync(userId);
+
+		var user = await _userManager.Users
+			.Where(u => u.Id  == userId && !u.IsDeleted)
+			.SingleOrDefaultAsync(cancellationToken);
 
 		if (user is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidJwtToken);
@@ -133,7 +137,11 @@ public class AuthService : IAuthService
 		if (userId is null)
 			return Result.Failure(UserErrors.InvalidJwtToken);
 
-		var user = await _userManager.FindByIdAsync(userId);
+		// var user = await _userManager.FindByIdAsync(userId);
+
+		var user = await _userManager.Users
+			.Where(u => u.Id == userId && !u.IsDeleted)
+			.SingleOrDefaultAsync(cancellationToken);
 
 		if (user is null)
 			return Result.Failure(UserErrors.InvalidJwtToken);
