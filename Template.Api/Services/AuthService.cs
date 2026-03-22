@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Security.Cryptography;
 using System.Text;
-using Template.Api.Abstractions.Consts;
-using Template.Api.Authentication;
-using Template.Api.Contracts.Auth;
 
 namespace Template.Api.Services;
 
@@ -14,17 +12,20 @@ public class AuthService : IAuthService
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IJwtProvider _jwtProvider;
 	private readonly ILogger<AuthService> _logger;
+	private readonly IEmailSender _emailSender;
 
 	private readonly int _refreshTokenExpiryDays = 14;
 	public AuthService(ApplicationDbContext context,
 			UserManager<ApplicationUser> userManager,
 			IJwtProvider jwtProvider,
-			ILogger<AuthService> logger)
+			ILogger<AuthService> logger,
+			IEmailSender emailSender)
 	{
 		_context = context;
 		_userManager = userManager;
 		_jwtProvider = jwtProvider;
 		_logger = logger;
+		_emailSender = emailSender;
 	}
 
 	public async Task<Result<AuthResult>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
@@ -193,6 +194,19 @@ public class AuthService : IAuthService
 				refreshTokenExpiration
 			);
 
+			//send a welcome email here
+
+			var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
+			new Dictionary<string, string>
+			{
+				{ "{{FirstName}}", user.FirstName },
+				{ "{{LastName}}", user.LastName },
+				{ "{{Email}}", user.Email! }
+			});
+
+			await _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody);
+
+
 			return Result.Success(response);
 		}
 
@@ -225,7 +239,16 @@ public class AuthService : IAuthService
 
 		_logger.LogInformation("Password reset code for {Email}: {Code} expires {Expiry}", user.Email, code, entity.ExpiresAt);
 
-		// TODO: send email with 'code' (do not log in production)
+		//send email with 'code' (do not log in production)
+
+		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.ForgetPassword,
+		new Dictionary<string, string>
+		{
+			{ "{{Code}}", code },
+			{ "{{FirstName}}", user.FirstName }
+		});
+
+		await _emailSender.SendEmailAsync(user.Email!, "🔐 Template: Change Password", emailBody);
 
 		return Result.Success();
 	}
@@ -276,7 +299,7 @@ public class AuthService : IAuthService
 
 		// Remove all old codes
 		var activeResetCodes = await _context.PasswordResetCodes
-			.Where(x => x.UserId == user.Id && x.UsedAt == null)	
+			.Where(x => x.UserId == user.Id && x.UsedAt == null)
 			.ToListAsync();
 
 		foreach (var resetCode in activeResetCodes)
