@@ -19,6 +19,9 @@ public sealed class  ApplicationUser : IdentityUser
 	public string? EmailChangeCodeHash { get; set; }
 	public DateTime? EmailChangeCodeExpiresAt { get; set; }
 
+	public bool IsDeleted { get; set; }
+	public DateTime? DeletedAt { get; set; }
+
 	public List<RefreshToken> RefreshTokens { get; set; } = [];
 }
 

@@ -30,7 +30,9 @@ public class AuthService : IAuthService
 
 	public async Task<Result<AuthResult>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
 	{
-		var user = await _userManager.FindByEmailAsync(email);
+		var user = await _userManager.Users
+			.Where(u => u.Email == email && !u.IsDeleted)
+			.SingleOrDefaultAsync(cancellationToken);
 
 		if (user is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidCredentials);
@@ -80,7 +82,11 @@ public class AuthService : IAuthService
 		if (userId is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidJwtToken);
 
-		var user = await _userManager.FindByIdAsync(userId);
+      // var user = await _userManager.FindByIdAsync(userId);
+
+		var user = await _userManager.Users
+			.Where(u => u.Id  == userId && !u.IsDeleted)
+			.SingleOrDefaultAsync(cancellationToken);
 
 		if (user is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidJwtToken);
@@ -131,7 +137,11 @@ public class AuthService : IAuthService
 		if (userId is null)
 			return Result.Failure(UserErrors.InvalidJwtToken);
 
-		var user = await _userManager.FindByIdAsync(userId);
+		// var user = await _userManager.FindByIdAsync(userId);
+
+		var user = await _userManager.Users
+			.Where(u => u.Id == userId && !u.IsDeleted)
+			.SingleOrDefaultAsync(cancellationToken);
 
 		if (user is null)
 			return Result.Failure(UserErrors.InvalidJwtToken);
@@ -217,7 +227,7 @@ public class AuthService : IAuthService
 
 	public async Task<Result> SendResetPasswordCodeAsync(string email)
 	{
-		if (await _userManager.FindByEmailAsync(email) is not { } user)
+		if (await _userManager.Users.Where(u => u.Email == email && !u.IsDeleted).SingleOrDefaultAsync() is not { } user)
 			return Result.Success();
 
 		var token = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -286,7 +296,7 @@ public class AuthService : IAuthService
 		}
 		catch
 		{
-			return Result.Failure(UserErrors.CodeReset with { Description = "Malformed reset token" });
+			return Result.Failure(UserErrors.ExpiredCode with { Description = "Malformed reset token" });
 		}
 
 		var resetResult = await _userManager.ResetPasswordAsync(user, identityToken, newPassword);

@@ -52,4 +52,12 @@ public class AccountController : ControllerBase
 		var result = await _userService.ConfirmEmailChangeAsync(User.GetUserId()!, request);
 		return result.IsSuccess ? Ok() : result.ToProblem();
 	}
+
+	[HttpDelete("delete-account")]
+	public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountRequest request, CancellationToken cancellationToken)
+	{
+		var result = await _userService.DeleteAccountAsync(User.GetUserId()!, request.Password);
+
+		return result.IsSuccess ? Ok() : result.ToProblem();
+	}
 }

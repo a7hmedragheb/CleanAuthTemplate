@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Template.Api.Persistence;
 
@@ -11,9 +12,11 @@ using Template.Api.Persistence;
 namespace Template.Api.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260322172116_AddSoftDeleteToUser")]
+    partial class AddSoftDeleteToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,7 +296,7 @@ namespace Template.Api.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PasswordResetCodes", (string)null);
+                    b.ToTable("PasswordResetCodes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

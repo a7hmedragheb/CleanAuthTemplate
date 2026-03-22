@@ -33,5 +33,14 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 			.HasMaxLength(256);
 
 		builder.Property(u => u.EmailChangeCodeExpiresAt);
+
+		builder.Property(u => u.IsDeleted)
+			.IsRequired()
+			.HasDefaultValue(false);
+
+		builder.Property(u => u.DeletedAt);
+
+		// Global Filter for disappear Deleted Users Query Results
+		builder.HasQueryFilter(u => !u.IsDeleted);
 	}
 }
