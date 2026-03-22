@@ -130,4 +130,29 @@ public class UserService : IUserService
 
 		return Result.Success();
 	}
+
+	public async Task<Result> DeleteAccountAsync(string userId, string password)
+	{
+		if (await _userManager.FindByIdAsync(userId) is not { } user)
+			return Result.Failure(UserErrors.UserNotFound);
+
+		var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
+
+		if (!isPasswordValid)
+			return Result.Failure(UserErrors.InvalidPassword);
+
+		//  Logical Delete
+		user.IsDeleted = true;
+		user.DeletedAt = DateTime.UtcNow;
+
+		//  Revoke Tokens
+		foreach (var token in user.RefreshTokens.Where(t => t.IsActive))
+			token.RevokedOn = DateTime.UtcNow;
+
+		await _userManager.UpdateAsync(user);
+
+		_logger.LogInformation("Account soft deleted for user {UserId}", userId);
+
+		return Result.Success();
+	}
 }
