@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Security.Cryptography;
 using System.Text;
-using Template.Api.Abstractions.Consts;
-using Template.Api.Authentication;
-using Template.Api.Contracts.Auth;
-using Template.Api.Helpers;
 
 namespace Template.Api.Services;
 
@@ -198,6 +194,19 @@ public class AuthService : IAuthService
 				refreshTokenExpiration
 			);
 
+			//send a welcome email here
+
+			var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
+			new Dictionary<string, string>
+			{
+				{ "{{FirstName}}", user.FirstName },
+				{ "{{LastName}}", user.LastName },
+				{ "{{Email}}", user.Email! }
+			});
+
+			await _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody);
+
+
 			return Result.Success(response);
 		}
 
@@ -230,7 +239,7 @@ public class AuthService : IAuthService
 
 		_logger.LogInformation("Password reset code for {Email}: {Code} expires {Expiry}", user.Email, code, entity.ExpiresAt);
 
-		// TODO: send email with 'code' (do not log in production)
+		//send email with 'code' (do not log in production)
 
 		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.ForgetPassword,
 		new Dictionary<string, string>
