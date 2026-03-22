@@ -26,5 +26,13 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 			.ToTable("RefreshTokens")
 			.WithOwner()
 			.HasForeignKey("UserId");
+
+		builder.Property(u => u.PendingEmail)
+			.HasMaxLength(256);
+
+		builder.Property(u => u.EmailChangeCodeHash)
+			.HasMaxLength(256);
+
+		builder.Property(u => u.EmailChangeCodeExpiresAt);
 	}
 }
