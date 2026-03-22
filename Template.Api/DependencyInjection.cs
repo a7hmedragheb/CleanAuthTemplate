@@ -36,6 +36,8 @@ public static class DependencyInjection
 		services.AddExceptionHandler<GlobalExceptionHandler>();
 		services.AddProblemDetails();
 
+		services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+		
 		return services;
 	}
 
