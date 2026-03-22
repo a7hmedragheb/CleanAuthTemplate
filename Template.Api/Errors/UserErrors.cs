@@ -23,4 +23,7 @@ public record UserErrors
 
 	public static readonly Error CodeReset =
 	  new("Code.Invalid", "No valid reset code found or it expired", StatusCodes.Status400BadRequest);
+
+	public static readonly Error UserNotFound =
+	  new("Code.UserNotFound", "User not found", StatusCodes.Status404NotFound);
 }

@@ -2,7 +2,7 @@
 
 namespace Template.Api.Entities;
 
-public sealed class ApplicationUser : IdentityUser
+public sealed class  ApplicationUser : IdentityUser
 {
 	public ApplicationUser()
 	{
