@@ -2,6 +2,7 @@
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Reflection;
@@ -9,7 +10,6 @@ using System.Text;
 using Template.Api.Authentication;
 
 namespace Template.Api;
-
 public static class DependencyInjection
 {
 	public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
@@ -24,8 +24,7 @@ public static class DependencyInjection
 
 
 		services.AddScoped<IAuthService, AuthService>();
-
-
+		services.AddScoped<IEmailSender, EmailService>();
 
 		services
 			.AddMapsterConfig()
@@ -37,7 +36,7 @@ public static class DependencyInjection
 		services.AddProblemDetails();
 
 		services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
-		
+
 		return services;
 	}
 
@@ -65,7 +64,7 @@ public static class DependencyInjection
 	{
 		services.AddIdentity<ApplicationUser, IdentityRole>()
 			.AddEntityFrameworkStores<ApplicationDbContext>()
-			.AddDefaultTokenProviders(); 
+			.AddDefaultTokenProviders();
 
 		services.AddScoped<IJwtProvider, JwtProvider>();
 
