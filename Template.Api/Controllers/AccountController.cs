@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Template.Api.Contracts.Users;
 using Template.Api.Extensions;
-
 
 [Route("/[Controller]")]
 [ApiController]
@@ -20,5 +20,14 @@ public class AccountController : ControllerBase
 		var result = await _userService.GetProfileAsync(User.GetUserId()!);
 
 		return Ok(result.Value);
+	}
+
+
+	[HttpPut("change-password")]
+	public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+	{
+		var result = await _userService.ChangePasswordAsync(User.GetUserId()!, request);
+
+		return result.IsSuccess ? NoContent() : result.ToProblem();
 	}
 }
