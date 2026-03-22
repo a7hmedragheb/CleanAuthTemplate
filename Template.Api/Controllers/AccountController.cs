@@ -22,6 +22,13 @@ public class AccountController : ControllerBase
 		return Ok(result.Value);
 	}
 
+	[HttpPut("update-profile")]
+	public async Task<IActionResult> Update([FromBody] UpdateProfileRequest request)
+	{
+		var result = await _userService.UpdateProfileAsync(User.GetUserId()!, request);
+
+		return result.IsSuccess ? NoContent() : result.ToProblem();
+	}
 
 	[HttpPut("change-password")]
 	public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)

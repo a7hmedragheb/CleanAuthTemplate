@@ -21,6 +21,24 @@ public class UserService : IUserService
 		return Result.Success(response);
 	}
 
+	public async Task<Result> UpdateProfileAsync(string userId, UpdateProfileRequest request)
+	{
+		//	if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
+		//		return Result.Failure<UserProfileResponse>(UserErrors.UserNotFound);
+
+		await _userManager.Users
+			.Where(x => x.Id == userId)
+			.ExecuteUpdateAsync(setters =>
+				setters
+					   .SetProperty(x => x.FirstName, request.FirstName)
+					   .SetProperty(x => x.LastName, request.LastName)
+					   .SetProperty(x => x.PhoneNumber, request.PhoneNumber)
+					   .SetProperty(x => x.DateOfBirth, request.DateOfBirth.ToDateTime(TimeOnly.MinValue))
+			);
+
+		return Result.Success();
+	}
+
 	public async Task<Result> ChangePasswordAsync(string userId, ChangePasswordRequest request)
 	{
 		var user = await _userManager.FindByIdAsync(userId);
