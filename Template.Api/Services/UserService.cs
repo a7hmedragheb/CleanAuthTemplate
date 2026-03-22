@@ -93,4 +93,41 @@ public class UserService : IUserService
 
 		return Result.Success();
 	}
+
+	public async Task<Result> ConfirmEmailChangeAsync(string userId, ConfirmEmailChangeRequest request)
+	{
+		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
+			return Result.Failure(UserErrors.UserNotFound);
+
+		if (user.PendingEmail != request.NewEmail)
+			return Result.Failure(UserErrors.InvalidCode);
+
+		if (user.EmailChangeCodeExpiresAt < DateTime.UtcNow)
+			return Result.Failure(UserErrors.InvalidCode);
+
+		var providedHash = SecurityHelper.ComputeSha256Hash(request.Code + user.SecurityStamp);
+
+		if (!string.Equals(providedHash, user.EmailChangeCodeHash, StringComparison.Ordinal))
+			return Result.Failure(UserErrors.InvalidCode);
+
+		var token = await _userManager.GenerateChangeEmailTokenAsync(user, request.NewEmail);
+		var result = await _userManager.ChangeEmailAsync(user, request.NewEmail, token);
+
+		if (!result.Succeeded)
+		{
+			var error = result.Errors.First();
+			return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+		}
+
+		// Remove Pending Email Data
+		user.PendingEmail = null;
+		user.EmailChangeCodeHash = null;
+		user.EmailChangeCodeExpiresAt = null;
+
+		await _userManager.UpdateAsync(user);
+
+		_logger.LogInformation("Email changed successfully for user {UserId}", userId);
+
+		return Result.Success();
+	}
 }
