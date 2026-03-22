@@ -1,4 +1,4 @@
-﻿using Template.Api.Contracts.Auth;
+﻿using Template.Api.Contracts.Users;
 
 namespace Template.Api.Mapping;
 
@@ -9,5 +9,9 @@ public class MappingConfigurations : IRegister
 		config.NewConfig<RegisterRequest, ApplicationUser>()
 			.Map(dest => dest.UserName, src => src.Email)
 			.Map(dest => dest.DateOfBirth, src => src.DateOfBirth.ToDateTime(TimeOnly.MinValue));
+
+		config.NewConfig<ApplicationUser, UserProfileResponse>()
+				.Map(dest => dest.Gender, src => src.Gender.ToString())
+				.Map(dest => dest.DateOfBirth, src => src.DateOfBirth.ToShortDateString());
 	}
 }
