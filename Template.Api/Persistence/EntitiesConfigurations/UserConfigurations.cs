@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Template.Api.Entities;
 
 namespace Template.Api.Persistence.EntitiesConfigurations;
 
@@ -26,5 +25,13 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 			.ToTable("RefreshTokens")
 			.WithOwner()
 			.HasForeignKey("UserId");
+
+		builder.Property(u => u.PendingEmail)
+			.HasMaxLength(256);
+
+		builder.Property(u => u.EmailChangeCodeHash)
+			.HasMaxLength(256);
+
+		builder.Property(u => u.EmailChangeCodeExpiresAt);
 	}
 }

@@ -223,8 +223,8 @@ public class AuthService : IAuthService
 		var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 		var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-		var code = GenerateVerificationCode();
-		var codeHash = ComputeSha256Hash(code + user.SecurityStamp);
+		var code = SecurityHelper.GenerateVerificationCode();
+		var codeHash = SecurityHelper.ComputeSha256Hash(code + user.SecurityStamp);
 
 		var entity = new PasswordResetCode
 		{
@@ -324,7 +324,7 @@ public class AuthService : IAuthService
 
 		if (resetEntry is null) return (user, null);
 
-		var providedHash = ComputeSha256Hash(code + user.SecurityStamp);
+		var providedHash = SecurityHelper.ComputeSha256Hash(code + user.SecurityStamp);
 
 		if (!string.Equals(providedHash, resetEntry.CodeHash, StringComparison.Ordinal))
 		{
@@ -344,33 +344,5 @@ public class AuthService : IAuthService
 		var refreshToken = RandomNumberGenerator.GetBytes(64);
 
 		return Convert.ToBase64String(refreshToken);
-	}
-
-	public static readonly char[] _allowedNumber = AllowedNumber._allowedNumber;
-
-	private static string GenerateVerificationCode(int length = 6)
-	{
-		var codeDigits = new char[length];
-
-		do
-		{
-			var randomBytes = RandomNumberGenerator.GetBytes(length);
-
-			for (int i = 0; i < length; i++)
-			{
-				if (randomBytes[i] < 256 - (256 % _allowedNumber.Length))
-					codeDigits[i] = _allowedNumber[randomBytes[i] % _allowedNumber.Length];
-			}
-
-		} while (codeDigits.Contains('\0'));
-
-		return new string(codeDigits);
-	}
-
-	private static string ComputeSha256Hash(string input)
-	{
-		var bytes = Encoding.UTF8.GetBytes(input);
-		var hashed = SHA256.HashData(bytes);
-		return Convert.ToBase64String(hashed);
 	}
 }

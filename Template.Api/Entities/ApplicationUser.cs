@@ -15,6 +15,10 @@ public sealed class  ApplicationUser : IdentityUser
 	public DateTime DateOfBirth { get; set; }
 	public Gender Gender { get; set; }
 
+	public string? PendingEmail { get; set; }
+	public string? EmailChangeCodeHash { get; set; }
+	public DateTime? EmailChangeCodeExpiresAt { get; set; }
+
 	public List<RefreshToken> RefreshTokens { get; set; } = [];
 }
 

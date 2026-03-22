@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Template.Api.Contracts.Users;
 
 namespace Template.Api.Services;
@@ -6,9 +7,15 @@ namespace Template.Api.Services;
 public class UserService : IUserService
 {
 	private readonly UserManager<ApplicationUser> _userManager;
-	public UserService(UserManager<ApplicationUser> userManager)
+	private readonly ILogger<AuthService> _logger;
+	private readonly IEmailSender _emailSender;
+	public UserService(UserManager<ApplicationUser> userManager,
+		ILogger<AuthService> logger,
+		IEmailSender emailSender)
 	{
 		_userManager = userManager;
+		_logger = logger;
+		_emailSender = emailSender;
 	}
 
 	public async Task<Result<UserProfileResponse>> GetProfileAsync(string userId)
@@ -51,5 +58,76 @@ public class UserService : IUserService
 		var error = result.Errors.First();
 
 		return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+	}
+
+	public async Task<Result> SendChangeEmailCodeAsync(string userId, string newEmail)
+	{
+		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
+			return Result.Failure(UserErrors.UserNotFound);
+
+		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == newEmail);
+		
+		if (emailIsExists)
+			return Result.Failure(UserErrors.DuplicatedEmail);
+
+		var code = SecurityHelper.GenerateVerificationCode();
+		var codeHash = SecurityHelper.ComputeSha256Hash(code + user.SecurityStamp);
+
+		user.PendingEmail = newEmail;
+		user.EmailChangeCodeHash = codeHash;
+		user.EmailChangeCodeExpiresAt = DateTime.UtcNow.AddMinutes(ResetPasswordConsts.ExpiryMinutes);
+
+		await _userManager.UpdateAsync(user);
+
+		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.ChangeEmail,
+			new Dictionary<string, string>
+			{
+				{ "{{FirstName}}", user.FirstName },
+				{ "{{Code}}", code }
+			}
+		);
+
+		await _emailSender.SendEmailAsync(newEmail, "🔐 Template: Change Email", emailBody);
+
+		_logger.LogInformation("Email change code sent to {NewEmail} for user {UserId}", newEmail, userId);
+
+		return Result.Success();
+	}
+
+	public async Task<Result> ConfirmEmailChangeAsync(string userId, ConfirmEmailChangeRequest request)
+	{
+		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
+			return Result.Failure(UserErrors.UserNotFound);
+
+		if (user.PendingEmail != request.NewEmail)
+			return Result.Failure(UserErrors.InvalidCode);
+
+		if (user.EmailChangeCodeExpiresAt < DateTime.UtcNow)
+			return Result.Failure(UserErrors.InvalidCode);
+
+		var providedHash = SecurityHelper.ComputeSha256Hash(request.Code + user.SecurityStamp);
+
+		if (!string.Equals(providedHash, user.EmailChangeCodeHash, StringComparison.Ordinal))
+			return Result.Failure(UserErrors.InvalidCode);
+
+		var token = await _userManager.GenerateChangeEmailTokenAsync(user, request.NewEmail);
+		var result = await _userManager.ChangeEmailAsync(user, request.NewEmail, token);
+
+		if (!result.Succeeded)
+		{
+			var error = result.Errors.First();
+			return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+		}
+
+		// Remove Pending Email Data
+		user.PendingEmail = null;
+		user.EmailChangeCodeHash = null;
+		user.EmailChangeCodeExpiresAt = null;
+
+		await _userManager.UpdateAsync(user);
+
+		_logger.LogInformation("Email changed successfully for user {UserId}", userId);
+
+		return Result.Success();
 	}
 }
