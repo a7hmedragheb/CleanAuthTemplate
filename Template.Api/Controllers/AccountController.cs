@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Template.Api.Contracts.Users;
 using Template.Api.Extensions;
 
@@ -36,5 +37,13 @@ public class AccountController : ControllerBase
 		var result = await _userService.ChangePasswordAsync(User.GetUserId()!, request);
 
 		return result.IsSuccess ? NoContent() : result.ToProblem();
+	}
+
+	[HttpPost("change-email")]
+	public async Task<IActionResult> SendChangeEmailCode([FromBody] ChangeEmailRequest request, CancellationToken cancellationToken)
+	{
+		var result = await _userService.SendChangeEmailCodeAsync(User.GetUserId()!, request.NewEmail);
+
+		return result.IsSuccess ? Ok() : result.ToProblem();
 	}
 }
