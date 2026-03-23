@@ -28,5 +28,8 @@
 		new("User.InvalidPassword", "Invalid password.", StatusCodes.Status400BadRequest);
 
 	public static readonly Error InvalidGoogleToken =
-		new("User.InvalidGoogleToken", "Invalid Google token.", StatusCodes.Status401Unauthorized);	
+		new("User.InvalidGoogleToken", "Invalid Google token.", StatusCodes.Status401Unauthorized);
+
+	public static readonly Error GoogleAccountCannotResetPassword =
+		new("User.GoogleAccount", "This account uses Google login. Please sign in with Google.", StatusCodes.Status400BadRequest);
 }

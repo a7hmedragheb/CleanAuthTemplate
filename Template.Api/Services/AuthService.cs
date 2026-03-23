@@ -310,6 +310,12 @@ public class AuthService : IAuthService
 		if (await _userManager.Users.Where(u => u.Email == email && !u.IsDeleted).SingleOrDefaultAsync() is not { } user)
 			return Result.Success();
 
+		//Google Account
+		var hasPassword = await _userManager.HasPasswordAsync(user);
+		
+		if (!hasPassword)
+			return Result.Failure(UserErrors.GoogleAccountCannotResetPassword);
+
 		var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 		var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
