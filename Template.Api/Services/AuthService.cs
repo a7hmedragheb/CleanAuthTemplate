@@ -211,9 +211,7 @@ public class AuthService : IAuthService
 			var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
 			new Dictionary<string, string>
 			{
-				{ "{{FirstName}}", user.FirstName },
-				{ "{{LastName}}", user.LastName },
-				{ "{{Email}}", user.Email! }
+				{ "{{FirstName}}", user.FirstName }
 			});
 
 			await _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody);
@@ -265,9 +263,7 @@ public class AuthService : IAuthService
 			var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
 				new Dictionary<string, string>
 				{
-					{ "{{FirstName}}", user.FirstName },
-					{ "{{LastName}}", user.LastName },
-					{ "{{Email}}", user.Email! }
+					{ "{{FirstName}}", user.FirstName }
 				}
 			);
 
