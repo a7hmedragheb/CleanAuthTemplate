@@ -41,6 +41,9 @@ public static class DependencyInjection
 
 		services.Configure<GoogleSettings>(configuration.GetSection(nameof(GoogleSettings)));
 
+		services.Configure<AppSettings>(configuration.GetSection(nameof(AppSettings)));
+
+
 		return services;
 	}
 
@@ -102,7 +105,7 @@ public static class DependencyInjection
 		services.Configure<IdentityOptions>(options =>
 		{
 			options.Password.RequiredLength = 8;
-			//options.SignIn.RequireConfirmedEmail = true;
+			options.SignIn.RequireConfirmedEmail = true;
 			options.User.RequireUniqueEmail = true;
 		});
 

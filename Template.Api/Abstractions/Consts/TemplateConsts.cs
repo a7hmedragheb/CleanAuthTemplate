@@ -7,5 +7,6 @@ public static class TemplateConsts
 	public const string ForgetPassword = "ForgetPassword";
 	public const string Welcome = "Welcome";
 	public const string ChangeEmail = "ChangeEmail";
+	public const string EmailConfirmation = "EmailConfirmation";
 
 }

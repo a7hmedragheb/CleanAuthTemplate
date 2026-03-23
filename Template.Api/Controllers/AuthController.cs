@@ -60,13 +60,22 @@ public class AuthController : ControllerBase
 	{
 		var result = await _authService.RegisterAsync(request, cancellationToken);
 
-		if (result.IsSuccess)
-		{
-			SetRefreshTokenInCookie(result.Value.RefreshToken, result.Value.RefreshTokenExpiration);
-			return Ok(result.Value.Response);
-		}
+		return result.IsSuccess ? Ok() : result.ToProblem();
+	}
 
-		return result.ToProblem();
+	[HttpPost("confirm-email")]
+	public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailRequest request)
+	{
+		var result = await _authService.ConfirmEmailAsync(request);
+
+		return result.IsSuccess ? Ok() : result.ToProblem();
+	}
+
+	[HttpPost("resend-confirmation-email")]
+	public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailRequest request)
+	{
+		var result = await _authService.ResendConfirmationEmailAsync(request);
+		return result.IsSuccess ? Ok() : result.ToProblem();
 	}
 
 	[HttpPost("forget-password")]
