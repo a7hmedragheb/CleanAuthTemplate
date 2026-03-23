@@ -41,6 +41,7 @@ public class UserService : IUserService
 					   .SetProperty(x => x.LastName, request.LastName)
 					   .SetProperty(x => x.PhoneNumber, request.PhoneNumber)
 					   .SetProperty(x => x.DateOfBirth, request.DateOfBirth.ToDateTime(TimeOnly.MinValue))
+					   .SetProperty(x => x.Gender, request.Gender)
 			);
 
 		return Result.Success();
@@ -48,7 +49,13 @@ public class UserService : IUserService
 
 	public async Task<Result> ChangePasswordAsync(string userId, ChangePasswordRequest request)
 	{
-		var user = await _userManager.FindByIdAsync(userId);
+		if (await _userManager.FindByIdAsync(userId) is not { } user)
+			return Result.Failure(UserErrors.UserNotFound);
+
+		var hasPassword = await _userManager.HasPasswordAsync(user);
+
+		if (!hasPassword)
+			return Result.Failure(UserErrors.GoogleAccountCannotResetPassword);
 
 		var result = await _userManager.ChangePasswordAsync(user!, request.CurrentPassword, request.NewPassword);
 
