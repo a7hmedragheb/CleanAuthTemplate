@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Template.Api.Abstractions.Consts;
-using Template.Api.Contracts.Auth;
 
 namespace Template.Api.Controllers;
 [Route("[controller]")]
@@ -93,6 +91,20 @@ public class AuthController : ControllerBase
 		var result = await _authService.ResetPasswordAsync(request.Email, request.Code, request.NewPassword);
 
 		return result.IsSuccess ? Ok() : result.ToProblem();
+	}
+
+	[HttpPost("login-google")]
+	public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthRequest request, CancellationToken cancellationToken)
+	{
+		var result = await _authService.GoogleLoginAsync(request.IdToken, cancellationToken);
+
+		if (result.IsSuccess)
+		{
+			SetRefreshTokenInCookie(result.Value.RefreshToken, result.Value.RefreshTokenExpiration);
+			return Ok(result.Value.Response);
+		}
+
+		return result.ToProblem();
 	}
 
 	private void SetRefreshTokenInCookie(string refreshToken, DateTime expires)
