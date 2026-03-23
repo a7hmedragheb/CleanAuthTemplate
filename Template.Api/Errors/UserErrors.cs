@@ -26,4 +26,7 @@
 
 	public static readonly Error InvalidPassword =
 		new("User.InvalidPassword", "Invalid password.", StatusCodes.Status400BadRequest);
-}	
+
+	public static readonly Error InvalidGoogleToken =
+		new("User.InvalidGoogleToken", "Invalid Google token.", StatusCodes.Status401Unauthorized);	
+}
