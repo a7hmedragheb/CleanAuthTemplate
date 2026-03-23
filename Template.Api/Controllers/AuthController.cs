@@ -63,7 +63,7 @@ public class AuthController : ControllerBase
 		return result.IsSuccess ? Ok() : result.ToProblem();
 	}
 
-	[HttpGet("confirm-email")]
+	[HttpPost("confirm-email")]
 	public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailRequest request)
 	{
 		var result = await _authService.ConfirmEmailAsync(request);
@@ -71,6 +71,12 @@ public class AuthController : ControllerBase
 		return result.IsSuccess ? Ok() : result.ToProblem();
 	}
 
+	[HttpPost("resend-confirmation-email")]
+	public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailRequest request)
+	{
+		var result = await _authService.ResendConfirmationEmailAsync(request);
+		return result.IsSuccess ? Ok() : result.ToProblem();
+	}
 
 	[HttpPost("forget-password")]
 	public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordRequest request)

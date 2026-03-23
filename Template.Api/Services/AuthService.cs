@@ -171,12 +171,12 @@ public class AuthService : IAuthService
 	public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
 	{
 		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
-		
+
 		if (emailIsExists)
 			return Result.Failure(UserErrors.DuplicatedEmail);
 
 		var phoneNumberIsExists = await _userManager.Users.AnyAsync(x => x.PhoneNumber == request.PhoneNumber, cancellationToken);
-		
+
 		if (phoneNumberIsExists)
 			return Result.Failure(UserErrors.DuplicatedPhoneNumber);
 
@@ -231,6 +231,19 @@ public class AuthService : IAuthService
 		await _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody);
 
 		_logger.LogInformation("Email confirmed for user {UserId}", user.Id);
+
+		return Result.Success();
+	}
+
+	public async Task<Result> ResendConfirmationEmailAsync(ResendConfirmationEmailRequest request)
+	{
+		if (await _userManager.Users.SingleOrDefaultAsync(u => u.Email == request.Email) is not { } user)
+			return Result.Success();
+
+		if (user.EmailConfirmed)
+			return Result.Failure(UserErrors.DuplicatedConfirmation);
+
+		await SendConfirmationEmailAsync(user);
 
 		return Result.Success();
 	}
@@ -318,7 +331,7 @@ public class AuthService : IAuthService
 
 		//Google Account
 		var hasPassword = await _userManager.HasPasswordAsync(user);
-		
+
 		if (!hasPassword)
 			return Result.Failure(UserErrors.GoogleAccountCannotResetPassword);
 
@@ -454,6 +467,9 @@ public class AuthService : IAuthService
 		var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
 		var confirmationLink = $"{_appSettings.FrontendUrl}/confirm-email?userId={user.Id}&code={encodedCode}";
+
+		//  Log for test
+		_logger.LogInformation("Confirmation Link for {Email}: userId={UserId} code={Code}", user.Email, user.Id, encodedCode);
 
 		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.EmailConfirmation,
 			new Dictionary<string, string>
