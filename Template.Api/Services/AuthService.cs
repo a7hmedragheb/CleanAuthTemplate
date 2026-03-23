@@ -234,9 +234,12 @@ public class AuthService : IAuthService
 		if (payload is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidGoogleToken);
 
-
 		var user = await _userManager.Users
-			.SingleOrDefaultAsync(u => u.Email == payload.Email, cancellationToken);
+		.IgnoreQueryFilters()
+		.SingleOrDefaultAsync(u => u.Email == payload.Email, cancellationToken);
+
+		if (user is not null && user.IsDeleted)
+			return Result.Failure<AuthResult>(UserErrors.UserNotFound);
 
 		if (user is null)
 		{
@@ -259,7 +262,16 @@ public class AuthService : IAuthService
 				return Result.Failure<AuthResult>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 			}
 
-			//TODO: send a welcome email here
+			var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
+				new Dictionary<string, string>
+				{
+					{ "{{FirstName}}", user.FirstName },
+					{ "{{LastName}}", user.LastName },
+					{ "{{Email}}", user.Email! }
+				}
+			);
+
+			await _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody);
 		}
 
 		var (token, expiresIn) = _jwtProvider.GenerateToken(user);
