@@ -24,9 +24,10 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 
 
 		RuleFor(x => x.Gender)
-						.IsInEnum()
-						.WithMessage("Invalid gender value. Please choose: 0 for Male or 1 for Female.");
-
+					.NotNull()
+					.WithMessage("Gender is required.")
+					.IsInEnum()
+					.WithMessage("Invalid gender value. Please choose: 0 for Male or 1 for Female.");
 
 		RuleFor(x => x.PhoneNumber)
 					.NotEmpty()

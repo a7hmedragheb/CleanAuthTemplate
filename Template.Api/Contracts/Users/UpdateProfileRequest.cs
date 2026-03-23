@@ -4,5 +4,6 @@ public record UpdateProfileRequest(
 	string FirstName,
 	string LastName,
 	string? PhoneNumber,
-	DateOnly DateOfBirth
+	DateOnly DateOfBirth,
+	Gender? Gender
 );
