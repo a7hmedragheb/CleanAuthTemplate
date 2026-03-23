@@ -41,6 +41,9 @@ public static class DependencyInjection
 
 		services.Configure<GoogleSettings>(configuration.GetSection(nameof(GoogleSettings)));
 
+		services.Configure<AppSettings>(configuration.GetSection(nameof(AppSettings)));
+
+
 		return services;
 	}
 
