@@ -32,4 +32,10 @@
 
 	public static readonly Error GoogleAccountCannotResetPassword =
 		new("User.GoogleAccount", "This account uses Google login. Please sign in with Google.", StatusCodes.Status400BadRequest);
+
+	public static readonly Error EmailNotConfirmed =
+		new("User.EmailNotConfirmed", "Email is not confirmed.", StatusCodes.Status401Unauthorized);
+
+	public static readonly Error DuplicatedConfirmation =
+		new("User.DuplicatedConfirmation", "Email is already confirmed.", StatusCodes.Status400BadRequest);
 }

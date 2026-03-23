@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -13,6 +14,8 @@ public class AuthService : IAuthService
 	private readonly ILogger<AuthService> _logger;
 	private readonly IEmailSender _emailSender;
 	private readonly IGoogleAuthService _googleAuthService;
+	private readonly AppSettings _appSettings;
+
 
 	private readonly int _refreshTokenExpiryDays = 14;
 	public AuthService(ApplicationDbContext context,
@@ -20,7 +23,8 @@ public class AuthService : IAuthService
 			IJwtProvider jwtProvider,
 			ILogger<AuthService> logger,
 			IEmailSender emailSender,
-			IGoogleAuthService googleAuthService)
+			IGoogleAuthService googleAuthService,
+			IOptions<AppSettings> appSettings)
 	{
 		_context = context;
 		_userManager = userManager;
@@ -28,6 +32,7 @@ public class AuthService : IAuthService
 		_logger = logger;
 		_emailSender = emailSender;
 		_googleAuthService = googleAuthService;
+		_appSettings = appSettings.Value;
 	}
 
 	public async Task<Result<AuthResult>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
@@ -38,6 +43,9 @@ public class AuthService : IAuthService
 
 		if (user is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidCredentials);
+
+		if (!user.EmailConfirmed)
+			return Result.Failure<AuthResult>(UserErrors.EmailNotConfirmed);
 
 		var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
 
@@ -160,69 +168,31 @@ public class AuthService : IAuthService
 		return Result.Success();
 	}
 
-	public async Task<Result<AuthResult>> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+	public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
 	{
 		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
-
+		
 		if (emailIsExists)
-			return Result.Failure<AuthResult>(UserErrors.DuplicatedEmail);
+			return Result.Failure(UserErrors.DuplicatedEmail);
 
 		var phoneNumberIsExists = await _userManager.Users.AnyAsync(x => x.PhoneNumber == request.PhoneNumber, cancellationToken);
-
+		
 		if (phoneNumberIsExists)
-			return Result.Failure<AuthResult>(UserErrors.DuplicatedPhoneNumber);
+			return Result.Failure(UserErrors.DuplicatedPhoneNumber);
 
 		var user = request.Adapt<ApplicationUser>();
 
 		var result = await _userManager.CreateAsync(user, request.Password);
 
-		if (result.Succeeded)
+		if (!result.Succeeded)
 		{
-			var (token, expiresIn) = _jwtProvider.GenerateToken(user);
-			var refreshToken = GenerateRefreshToken();
-			var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
-
-			user.RefreshTokens.Add(new RefreshToken
-			{
-				Token = refreshToken,
-				ExpiresOn = refreshTokenExpiration
-			});
-
-			await _userManager.UpdateAsync(user);
-
-			var response = new AuthResult(
-				new AuthResponse(
-					user.Id,
-					user.Email,
-					user.FirstName,
-					user.LastName,
-					user.PhoneNumber,
-					DateOnly.FromDateTime(user.DateOfBirth),
-					user.Gender.ToString(),
-					token,
-					expiresIn
-				),
-				refreshToken,
-				refreshTokenExpiration
-			);
-
-			//send a welcome email here
-
-			var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
-			new Dictionary<string, string>
-			{
-				{ "{{FirstName}}", user.FirstName }
-			});
-
-			await _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody);
-
-
-			return Result.Success(response);
+			var error = result.Errors.First();
+			return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 		}
 
-		var error = result.Errors.First();
+		await SendConfirmationEmailAsync(user);
 
-		return Result.Failure<AuthResult>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+		return Result.Success();
 	}
 
 	public async Task<Result<AuthResult>> GoogleLoginAsync(string idToken, CancellationToken cancellationToken = default)
@@ -436,5 +406,25 @@ public class AuthService : IAuthService
 		var refreshToken = RandomNumberGenerator.GetBytes(64);
 
 		return Convert.ToBase64String(refreshToken);
+	}
+
+	private async Task SendConfirmationEmailAsync(ApplicationUser user)
+	{
+		var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+		var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+		var confirmationLink = $"{_appSettings.FrontendUrl}/confirm-email?userId={user.Id}&code={encodedCode}";
+
+		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.EmailConfirmation,
+			new Dictionary<string, string>
+			{
+				{ "{{FirstName}}", user.FirstName },
+				{ "{{ConfirmationLink}}", confirmationLink }
+			}
+		);
+
+		await _emailSender.SendEmailAsync(user.Email!, "✅ Template: Confirm Your Email", emailBody);
+
+		_logger.LogInformation("Confirmation email sent to {Email}", user.Email);
 	}
 }

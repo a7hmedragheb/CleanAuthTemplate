@@ -59,14 +59,8 @@ public class AuthController : ControllerBase
 	public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
 	{
 		var result = await _authService.RegisterAsync(request, cancellationToken);
-
-		if (result.IsSuccess)
-		{
-			SetRefreshTokenInCookie(result.Value.RefreshToken, result.Value.RefreshTokenExpiration);
-			return Ok(result.Value.Response);
-		}
-
-		return result.ToProblem();
+	
+		return result.IsSuccess ? Ok() : result.ToProblem();
 	}
 
 	[HttpPost("forget-password")]
