@@ -59,9 +59,18 @@ public class AuthController : ControllerBase
 	public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
 	{
 		var result = await _authService.RegisterAsync(request, cancellationToken);
-	
+
 		return result.IsSuccess ? Ok() : result.ToProblem();
 	}
+
+	[HttpGet("confirm-email")]
+	public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailRequest request)
+	{
+		var result = await _authService.ConfirmEmailAsync(request);
+
+		return result.IsSuccess ? Ok() : result.ToProblem();
+	}
+
 
 	[HttpPost("forget-password")]
 	public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordRequest request)

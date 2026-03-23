@@ -195,6 +195,46 @@ public class AuthService : IAuthService
 		return Result.Success();
 	}
 
+	public async Task<Result> ConfirmEmailAsync(ConfirmEmailRequest request)
+	{
+		if (await _userManager.FindByIdAsync(request.UserId) is not { } user)
+			return Result.Failure(UserErrors.InvalidCode);
+
+		if (user.EmailConfirmed)
+			return Result.Failure(UserErrors.DuplicatedConfirmation);
+
+		string code;
+		try
+		{
+			code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
+		}
+		catch (FormatException)
+		{
+			return Result.Failure(UserErrors.InvalidCode);
+		}
+
+		var result = await _userManager.ConfirmEmailAsync(user, code);
+
+		if (!result.Succeeded)
+		{
+			var error = result.Errors.First();
+			return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+		}
+
+		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
+			new Dictionary<string, string>
+			{
+				{ "{{FirstName}}", user.FirstName }
+			}
+		);
+
+		await _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody);
+
+		_logger.LogInformation("Email confirmed for user {UserId}", user.Id);
+
+		return Result.Success();
+	}
+
 	public async Task<Result<AuthResult>> GoogleLoginAsync(string idToken, CancellationToken cancellationToken = default)
 	{
 		var payload = await _googleAuthService.ValidateGoogleTokenAsync(idToken);
