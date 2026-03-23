@@ -5,7 +5,6 @@ using System.Security.Cryptography;
 using System.Text;
 
 namespace Template.Api.Services;
-
 public class AuthService : IAuthService
 {
 	private readonly ApplicationDbContext _context;
@@ -13,19 +12,22 @@ public class AuthService : IAuthService
 	private readonly IJwtProvider _jwtProvider;
 	private readonly ILogger<AuthService> _logger;
 	private readonly IEmailSender _emailSender;
+	private readonly IGoogleAuthService _googleAuthService;
 
 	private readonly int _refreshTokenExpiryDays = 14;
 	public AuthService(ApplicationDbContext context,
 			UserManager<ApplicationUser> userManager,
 			IJwtProvider jwtProvider,
 			ILogger<AuthService> logger,
-			IEmailSender emailSender)
+			IEmailSender emailSender,
+			IGoogleAuthService googleAuthService)
 	{
 		_context = context;
 		_userManager = userManager;
 		_jwtProvider = jwtProvider;
 		_logger = logger;
 		_emailSender = emailSender;
+		_googleAuthService = googleAuthService;
 	}
 
 	public async Task<Result<AuthResult>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
@@ -82,10 +84,10 @@ public class AuthService : IAuthService
 		if (userId is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidJwtToken);
 
-      // var user = await _userManager.FindByIdAsync(userId);
+		// var user = await _userManager.FindByIdAsync(userId);
 
 		var user = await _userManager.Users
-			.Where(u => u.Id  == userId && !u.IsDeleted)
+			.Where(u => u.Id == userId && !u.IsDeleted)
 			.SingleOrDefaultAsync(cancellationToken);
 
 		if (user is null)
@@ -223,6 +225,84 @@ public class AuthService : IAuthService
 		var error = result.Errors.First();
 
 		return Result.Failure<AuthResult>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+	}
+
+	public async Task<Result<AuthResult>> GoogleLoginAsync(string idToken, CancellationToken cancellationToken = default)
+	{
+		var payload = await _googleAuthService.ValidateGoogleTokenAsync(idToken);
+
+		if (payload is null)
+			return Result.Failure<AuthResult>(UserErrors.InvalidGoogleToken);
+
+		var user = await _userManager.Users
+		.IgnoreQueryFilters()
+		.SingleOrDefaultAsync(u => u.Email == payload.Email, cancellationToken);
+
+		if (user is not null && user.IsDeleted)
+			return Result.Failure<AuthResult>(UserErrors.UserNotFound);
+
+		if (user is null)
+		{
+			user = new ApplicationUser
+			{
+				Email = payload.Email,
+				UserName = payload.Email,
+				FirstName = payload.GivenName ?? string.Empty,
+				LastName = payload.FamilyName ?? string.Empty,
+				EmailConfirmed = true,
+				Gender = Gender.Male,
+				DateOfBirth = DateTime.MinValue
+			};
+
+			var createResult = await _userManager.CreateAsync(user);
+
+			if (!createResult.Succeeded)
+			{
+				var error = createResult.Errors.First();
+				return Result.Failure<AuthResult>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+			}
+
+			var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
+				new Dictionary<string, string>
+				{
+					{ "{{FirstName}}", user.FirstName },
+					{ "{{LastName}}", user.LastName },
+					{ "{{Email}}", user.Email! }
+				}
+			);
+
+			await _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody);
+		}
+
+		var (token, expiresIn) = _jwtProvider.GenerateToken(user);
+		var refreshToken = GenerateRefreshToken();
+		var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
+
+		user.RefreshTokens.Add(new RefreshToken
+		{
+			Token = refreshToken,
+			ExpiresOn = refreshTokenExpiration
+		});
+
+		await _userManager.UpdateAsync(user);
+
+		var response = new AuthResult(
+			new AuthResponse(
+				user.Id,
+				user.Email,
+				user.FirstName,
+				user.LastName,
+				user.PhoneNumber,
+				DateOnly.FromDateTime(user.DateOfBirth),
+				user.Gender.ToString(),
+				token,
+				expiresIn
+			),
+			refreshToken,
+			refreshTokenExpiration
+		);
+
+		return Result.Success(response);
 	}
 
 	public async Task<Result> SendResetPasswordCodeAsync(string email)

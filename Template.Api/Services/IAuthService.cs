@@ -11,4 +11,5 @@ public interface IAuthService
 	Task<Result> SendResetPasswordCodeAsync(string email);
 	Task<Result> VerifyResetCodeAsync(string email, string code);
 	Task<Result> ResetPasswordAsync(string email, string code, string newPassword);
+	Task<Result<AuthResult>> GoogleLoginAsync(string idToken, CancellationToken cancellationToken = default);
 }

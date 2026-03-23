@@ -26,6 +26,7 @@ public static class DependencyInjection
 		services.AddScoped<IAuthService, AuthService>();
 		services.AddScoped<IUserService, UserService>();
 		services.AddScoped<IEmailSender, EmailService>();
+		services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
 		services
 			.AddMapsterConfig()
@@ -37,6 +38,8 @@ public static class DependencyInjection
 		services.AddProblemDetails();
 
 		services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+
+		services.Configure<GoogleSettings>(configuration.GetSection(nameof(GoogleSettings)));
 
 		return services;
 	}
