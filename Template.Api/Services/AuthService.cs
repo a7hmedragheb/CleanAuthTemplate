@@ -471,6 +471,7 @@ public class AuthService : IAuthService
 		var hashed = SHA256.HashData(bytes);
 		return Convert.ToBase64String(hashed);
 	}
+
 	private static string GenerateRefreshToken()
 	{
 		var refreshToken = RandomNumberGenerator.GetBytes(64);
