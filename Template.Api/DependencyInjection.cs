@@ -16,6 +16,20 @@ public static class DependencyInjection
 	{
 		services.AddControllers();
 
+		var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+		services.AddCors(options =>
+			options.AddDefaultPolicy(builder =>
+				builder
+					//.AllowAnyOrigin()
+					.AllowAnyMethod()
+					.AllowAnyHeader()
+					.WithOrigins(allowedOrigins!)
+			)
+		);
+
+		//services.AddAuthConfig(configuration);
+
 		var ConnectionString = configuration.GetConnectionString("DefaultConnection") ??
 			throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -31,7 +45,7 @@ public static class DependencyInjection
 		services
 			.AddMapsterConfig()
 			.AddFluentValidationConfig()
-			.AddAuthorConfig(configuration);
+			.AddAuthConfig(configuration);
 
 
 		services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -67,7 +81,7 @@ public static class DependencyInjection
 		return services;
 	}
 
-	private static IServiceCollection AddAuthorConfig(this IServiceCollection services, IConfiguration configuration)
+	private static IServiceCollection AddAuthConfig(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddIdentity<ApplicationUser, IdentityRole>()
 			.AddEntityFrameworkStores<ApplicationDbContext>()
