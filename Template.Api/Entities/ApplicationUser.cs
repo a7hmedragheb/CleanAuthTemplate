@@ -16,8 +16,6 @@ public sealed class  ApplicationUser : IdentityUser
 	public Gender? Gender { get; set; }
 
 	public string? PendingEmail { get; set; }
-	public string? EmailChangeCodeHash { get; set; }
-	public DateTime? EmailChangeCodeExpiresAt { get; set; }
 
 	public bool IsDeleted { get; set; }
 	public DateTime? DeletedAt { get; set; }
