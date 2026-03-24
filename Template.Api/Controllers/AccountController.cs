@@ -46,7 +46,7 @@ public class AccountController : ControllerBase
 		return result.IsSuccess ? Ok() : result.ToProblem();
 	}
 
-	[HttpPut("confirm-email")]
+	[HttpPut("confirm-email-change")]
 	public async Task<IActionResult> ConfirmEmailChange([FromBody] ConfirmEmailChangeRequest request)
 	{
 		var result = await _userService.ConfirmEmailChangeAsync(User.GetUserId()!, request);

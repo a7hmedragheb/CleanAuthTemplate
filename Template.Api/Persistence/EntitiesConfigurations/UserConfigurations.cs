@@ -28,11 +28,6 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 		builder.Property(u => u.PendingEmail)
 			.HasMaxLength(256);
 
-		builder.Property(u => u.EmailChangeCodeHash)
-			.HasMaxLength(256);
-
-		builder.Property(u => u.EmailChangeCodeExpiresAt);
-
 		builder.Property(u => u.IsDeleted)
 			.IsRequired()
 			.HasDefaultValue(false);

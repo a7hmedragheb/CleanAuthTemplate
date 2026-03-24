@@ -2,5 +2,5 @@
 
 public record ConfirmEmailChangeRequest(
 	string NewEmail,
-	string Code
+	string Token
 );
