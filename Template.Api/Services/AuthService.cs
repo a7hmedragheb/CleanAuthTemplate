@@ -37,9 +37,7 @@ public class AuthService : IAuthService
 
 	public async Task<Result<AuthResult>> GetTokenAsync(string email, string password, CancellationToken cancellationToken = default)
 	{
-		var user = await _userManager.Users
-			.Where(u => u.Email == email && !u.IsDeleted)
-			.SingleOrDefaultAsync(cancellationToken);
+		var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == email, cancellationToken);
 
 		if (user is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidCredentials);
@@ -74,7 +72,7 @@ public class AuthService : IAuthService
 				user.LastName,
 				user.PhoneNumber,
 				DateOnly.FromDateTime(user.DateOfBirth),
-				user.Gender.ToString(),
+				user.Gender.ToString()!,
 				token,
 				expiresIn
 			),
@@ -92,11 +90,7 @@ public class AuthService : IAuthService
 		if (userId is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidJwtToken);
 
-		// var user = await _userManager.FindByIdAsync(userId);
-
-		var user = await _userManager.Users
-			.Where(u => u.Id == userId && !u.IsDeleted)
-			.SingleOrDefaultAsync(cancellationToken);
+		var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
 		if (user is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidJwtToken);
@@ -129,7 +123,7 @@ public class AuthService : IAuthService
 				user.LastName,
 				user.PhoneNumber,
 				DateOnly.FromDateTime(user.DateOfBirth),
-				user.Gender.ToString(),
+				user.Gender.ToString()!,
 				newToken,
 				expiresIn
 			),
@@ -147,11 +141,8 @@ public class AuthService : IAuthService
 		if (userId is null)
 			return Result.Failure(UserErrors.InvalidJwtToken);
 
-		// var user = await _userManager.FindByIdAsync(userId);
 
-		var user = await _userManager.Users
-			.Where(u => u.Id == userId && !u.IsDeleted)
-			.SingleOrDefaultAsync(cancellationToken);
+		var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
 		if (user is null)
 			return Result.Failure(UserErrors.InvalidJwtToken);
@@ -271,7 +262,7 @@ public class AuthService : IAuthService
 				FirstName = payload.GivenName ?? string.Empty,
 				LastName = payload.FamilyName ?? string.Empty,
 				EmailConfirmed = true,
-				Gender = Gender.Male,
+				Gender = null,
 				DateOfBirth = DateTime.MinValue
 			};
 
@@ -313,7 +304,7 @@ public class AuthService : IAuthService
 				user.LastName,
 				user.PhoneNumber,
 				DateOnly.FromDateTime(user.DateOfBirth),
-				user.Gender.ToString(),
+				user.Gender?.ToString() ?? string.Empty,
 				token,
 				expiresIn
 			),
@@ -326,7 +317,7 @@ public class AuthService : IAuthService
 
 	public async Task<Result> SendResetPasswordCodeAsync(string email)
 	{
-		if (await _userManager.Users.Where(u => u.Email == email && !u.IsDeleted).SingleOrDefaultAsync() is not { } user)
+		if (await _userManager.Users.SingleOrDefaultAsync(u => u.Email == email) is not { } user)
 			return Result.Success();
 
 		//Google Account
@@ -466,7 +457,7 @@ public class AuthService : IAuthService
 		var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 		var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-		var confirmationLink = $"{_appSettings.FrontendUrl}/confirm-email?userId={user.Id}&code={encodedCode}";
+		var confirmationLink = $"{_appSettings.FrontendBaseUrl}/confirm-email?userId={user.Id}&code={encodedCode}";
 
 		//  Log for test
 		_logger.LogInformation("Confirmation Link for {Email}: userId={UserId} code={Code}", user.Email, user.Id, encodedCode);

@@ -17,8 +17,7 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 		builder.Property(u => u.DateOfBirth)
 			.IsRequired();
 
-		builder.Property(u => u.Gender)
-			.IsRequired();
+		builder.Property(u => u.Gender);
 
 		builder
 			.OwnsMany(u => u.RefreshTokens)

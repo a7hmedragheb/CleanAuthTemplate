@@ -30,9 +30,6 @@ public class UserService : IUserService
 
 	public async Task<Result> UpdateProfileAsync(string userId, UpdateProfileRequest request)
 	{
-		//	if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
-		//		return Result.Failure<UserProfileResponse>(UserErrors.UserNotFound);
-
 		await _userManager.Users
 			.Where(x => x.Id == userId)
 			.ExecuteUpdateAsync(setters =>
@@ -49,7 +46,7 @@ public class UserService : IUserService
 
 	public async Task<Result> ChangePasswordAsync(string userId, ChangePasswordRequest request)
 	{
-		if (await _userManager.FindByIdAsync(userId) is not { } user)
+		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
 
 		var hasPassword = await _userManager.HasPasswordAsync(user);
@@ -73,7 +70,7 @@ public class UserService : IUserService
 			return Result.Failure(UserErrors.UserNotFound);
 
 		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == newEmail);
-		
+
 		if (emailIsExists)
 			return Result.Failure(UserErrors.DuplicatedEmail);
 
@@ -140,7 +137,7 @@ public class UserService : IUserService
 
 	public async Task<Result> DeleteAccountAsync(string userId, string password)
 	{
-		if (await _userManager.FindByIdAsync(userId) is not { } user)
+		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
 
 		var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
