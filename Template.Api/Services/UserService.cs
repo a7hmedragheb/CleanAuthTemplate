@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
+using System.Text;
 using Template.Api.Contracts.Users;
+using Template.Api.Settings;
 
 namespace Template.Api.Services;
 
@@ -9,13 +13,17 @@ public class UserService : IUserService
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly ILogger<UserService> _logger;
 	private readonly IEmailSender _emailSender;
+	private readonly AppSettings _appSettings;
+
 	public UserService(UserManager<ApplicationUser> userManager,
 		ILogger<UserService> logger,
-		IEmailSender emailSender)
+		IEmailSender emailSender,
+		IOptions<AppSettings> appSettings)
 	{
 		_userManager = userManager;
 		_logger = logger;
 		_emailSender = emailSender;
+		_appSettings = appSettings.Value;
 	}
 
 	public async Task<Result<UserProfileResponse>> GetProfileAsync(string userId)
@@ -74,26 +82,12 @@ public class UserService : IUserService
 		if (emailIsExists)
 			return Result.Failure(UserErrors.DuplicatedEmail);
 
-		var code = SecurityHelper.GenerateVerificationCode();
-		var codeHash = SecurityHelper.ComputeSha256Hash(code + user.SecurityStamp);
-
 		user.PendingEmail = newEmail;
-		user.EmailChangeCodeHash = codeHash;
-		user.EmailChangeCodeExpiresAt = DateTime.UtcNow.AddMinutes(ResetPasswordConsts.ExpiryMinutes);
-
 		await _userManager.UpdateAsync(user);
 
-		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.ChangeEmail,
-			new Dictionary<string, string>
-			{
-				{ "{{FirstName}}", user.FirstName },
-				{ "{{Code}}", code }
-			}
-		);
+		await SendChangeEmailAsync(user, newEmail);
 
-		await _emailSender.SendEmailAsync(newEmail, "🔐 Template: Change Email", emailBody);
-
-		_logger.LogInformation("Email change code sent to {NewEmail} for user {UserId}", newEmail, userId);
+		_logger.LogInformation("Email change link sent to {NewEmail} for user {UserId}", newEmail, userId);
 
 		return Result.Success();
 	}
@@ -106,16 +100,18 @@ public class UserService : IUserService
 		if (user.PendingEmail != request.NewEmail)
 			return Result.Failure(UserErrors.InvalidCode);
 
-		if (user.EmailChangeCodeExpiresAt < DateTime.UtcNow)
+		string decodedToken;
+	
+		try
+		{
+			decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
+		}
+		catch (FormatException)
+		{
 			return Result.Failure(UserErrors.InvalidCode);
+		}
 
-		var providedHash = SecurityHelper.ComputeSha256Hash(request.Code + user.SecurityStamp);
-
-		if (!string.Equals(providedHash, user.EmailChangeCodeHash, StringComparison.Ordinal))
-			return Result.Failure(UserErrors.InvalidCode);
-
-		var token = await _userManager.GenerateChangeEmailTokenAsync(user, request.NewEmail);
-		var result = await _userManager.ChangeEmailAsync(user, request.NewEmail, token);
+		var result = await _userManager.ChangeEmailAsync(user, request.NewEmail, decodedToken);
 
 		if (!result.Succeeded)
 		{
@@ -123,11 +119,9 @@ public class UserService : IUserService
 			return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 		}
 
-		// Remove Pending Email Data
-		user.PendingEmail = null;
-		user.EmailChangeCodeHash = null;
-		user.EmailChangeCodeExpiresAt = null;
+		await _userManager.SetUserNameAsync(user, request.NewEmail);
 
+		user.PendingEmail = null;
 		await _userManager.UpdateAsync(user);
 
 		_logger.LogInformation("Email changed successfully for user {UserId}", userId);
@@ -158,5 +152,25 @@ public class UserService : IUserService
 		_logger.LogInformation("Account soft deleted for user {UserId}", userId);
 
 		return Result.Success();
+	}
+
+	private async Task SendChangeEmailAsync(ApplicationUser user, string newEmail)
+	{
+		var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
+		var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+		var changeEmailLink = $"{_appSettings.FrontendBaseUrl}/confirm-email-change?userId={user.Id}&email={Uri.EscapeDataString(newEmail)}&token={encodedToken}";
+
+		_logger.LogInformation("Email change link for {UserId}: {Link}", user.Id, changeEmailLink);
+
+		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.ChangeEmail,
+			new Dictionary<string, string>
+			{
+				{ "{{FirstName}}", user.FirstName },
+				{ "{{ChangeEmailLink}}", changeEmailLink }
+			}
+		);
+
+		await _emailSender.SendEmailAsync(newEmail, "🔐 Template: Confirm Email Change", emailBody);
 	}
 }
