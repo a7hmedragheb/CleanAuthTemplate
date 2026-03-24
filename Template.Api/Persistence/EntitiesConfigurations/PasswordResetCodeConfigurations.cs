@@ -30,5 +30,7 @@ public class PasswordResetCodeConfigurations : IEntityTypeConfiguration<Password
 		builder.Property(x => x.Attempts)
 			.IsRequired()
 			.HasDefaultValue(0);
+
+		builder.HasQueryFilter(x => !x.User.IsDeleted);
 	}
 }
