@@ -38,5 +38,3 @@ public class CleanUpExpiredRefreshTokensJob(
 		logger.LogInformation("Removed {Count} expired refresh tokens", totalRemoved);
 	}
 }
-
-//fix: replace IsActive computed property with raw DB columns in cleanup job
