@@ -128,7 +128,7 @@ public static class DependencyInjection
 		return services;
 	}
 
-	private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services,IConfiguration configuration)
+	private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services, IConfiguration configuration)
 	{
 		// Hangfire
 		services.AddHangfire(config => config
@@ -141,6 +141,8 @@ public static class DependencyInjection
 		services.AddHangfireServer();
 
 		services.AddScoped<CleanUpExpiredRefreshTokensJob>();
+		services.AddScoped<CleanUpExpiredPasswordResetCodesJob>();
+
 
 		return services;
 	}

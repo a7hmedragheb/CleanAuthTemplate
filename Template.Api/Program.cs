@@ -20,7 +20,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+	app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
@@ -50,6 +50,13 @@ using (var scope = app.Services.CreateScope())
 		"cleanup-expired-refresh-tokens",
 		job => job.ExecuteAsync(),
 		Cron.Daily()
+	);
+
+	// every Hour
+	recurringJobManager.AddOrUpdate<CleanUpExpiredPasswordResetCodesJob>(
+		 "cleanup-expired-reset-codes",
+		job => job.ExecuteAsync(),
+		Cron.Hourly()
 	);
 }
 
