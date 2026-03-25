@@ -4,12 +4,12 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
-using Template.Api.Authentication;
+using System.Threading.RateLimiting;
 using Template.Api.Jobs;
 
 namespace Template.Api;
@@ -46,7 +46,8 @@ public static class DependencyInjection
 		services
 			.AddMapsterConfig()
 			.AddFluentValidationConfig()
-			.AddAuthConfig(configuration);
+			.AddAuthConfig(configuration)
+			.AddRateLimitingConfig();
 
 
 		services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -147,4 +148,83 @@ public static class DependencyInjection
 		return services;
 	}
 
+	private static IServiceCollection AddRateLimitingConfig(this IServiceCollection services)
+	{
+		services.AddRateLimiter(options =>
+		{
+			options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+			static string GetClientKey(HttpContext context)
+			{
+				return context.User.Identity?.IsAuthenticated == true
+					? context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!
+					: context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+			}
+
+			// 30 requests per minute with queuing
+			options.AddPolicy("GeneralPolicy", context =>
+				RateLimitPartition.GetSlidingWindowLimiter(
+					GetClientKey(context),
+					_ => new SlidingWindowRateLimiterOptions
+					{
+						PermitLimit = 30,
+						Window = TimeSpan.FromMinutes(1),
+						SegmentsPerWindow = 6,
+						QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+						QueueLimit = 5
+					}
+				)
+			);
+
+			//  10 requests per minute without queuing
+			options.AddPolicy("AuthPolicy", context =>
+				RateLimitPartition.GetSlidingWindowLimiter(
+					GetClientKey(context),
+					_ => new SlidingWindowRateLimiterOptions
+					{
+						PermitLimit = 10,
+						Window = TimeSpan.FromMinutes(1),
+						SegmentsPerWindow = 6,
+						QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+						QueueLimit = 0
+					}
+				)
+			);
+
+			//  5 requests per minute without queuing
+			options.AddPolicy("SensitivePolicy", context =>
+				RateLimitPartition.GetSlidingWindowLimiter(
+					GetClientKey(context),
+					_ => new SlidingWindowRateLimiterOptions
+					{
+						PermitLimit = 3,
+						Window = TimeSpan.FromMinutes(1),
+						SegmentsPerWindow = 6,
+						QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+						QueueLimit = 0
+					}
+				)
+			);
+
+			// Custom Response
+			options.OnRejected = async (context, cancellationToken) =>
+			{
+				context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+
+				if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+					context.HttpContext.Response.Headers.RetryAfter =
+						((int)retryAfter.TotalSeconds).ToString();
+
+				await context.HttpContext.Response.WriteAsJsonAsync(new
+				{
+					type = "https://tools.ietf.org/html/rfc6585#section-4",
+					title = "Too Many Requests",
+					status = 429,
+					detail = "You have exceeded the rate limit. Please try again later."
+				}, cancellationToken);
+			};
+		});
+
+		return services;
+	}
 }

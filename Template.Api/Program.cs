@@ -1,5 +1,4 @@
 using Hangfire;
-using Hangfire.Dashboard;
 using HangfireBasicAuthenticationFilter;
 using Template.Api;
 using Template.Api.Jobs;
@@ -23,7 +22,6 @@ if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
 
 // https://localhost:7131/jobs
 app.UseHangfireDashboard("/jobs", new DashboardOptions
@@ -60,6 +58,10 @@ using (var scope = app.Services.CreateScope())
 	);
 }
 
+app.UseHttpsRedirection();
+
+app.UseRateLimiter(); 
+	
 app.UseCors();
 
 app.UseAuthorization();

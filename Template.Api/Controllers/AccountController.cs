@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Template.Api.Contracts.Users;
 using Template.Api.Extensions;
 
 [Route("/[Controller]")]
 [ApiController]
 [Authorize]
+[EnableRateLimiting("GeneralPolicy")] 
 public class AccountController : ControllerBase
 {
 	private readonly IUserService _userService;
@@ -31,6 +33,7 @@ public class AccountController : ControllerBase
 	}
 
 	[HttpPut("change-password")]
+	[EnableRateLimiting("SensitivePolicy")] 
 	public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
 	{
 		var result = await _userService.ChangePasswordAsync(User.GetUserId()!, request);
@@ -39,6 +42,7 @@ public class AccountController : ControllerBase
 	}
 
 	[HttpPost("change-email")]
+	[EnableRateLimiting("SensitivePolicy")]
 	public async Task<IActionResult> SendChangeEmailCode([FromBody] ChangeEmailRequest request)
 	{
 		var result = await _userService.SendChangeEmailCodeAsync(User.GetUserId()!, request.NewEmail);
@@ -54,6 +58,7 @@ public class AccountController : ControllerBase
 	}
 
 	[HttpDelete("delete-account")]
+	[EnableRateLimiting("SensitivePolicy")] 
 	public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountRequest request, CancellationToken cancellationToken)
 	{
 		var result = await _userService.DeleteAccountAsync(User.GetUserId()!, request.Password);
