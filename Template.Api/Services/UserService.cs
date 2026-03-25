@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using System.Text;
 using Template.Api.Contracts.Users;
-using Template.Api.Settings;
 
 namespace Template.Api.Services;
 
@@ -172,6 +172,6 @@ public class UserService : IUserService
 			}
 		);
 
-		await _emailSender.SendEmailAsync(newEmail, "🔐 Template: Confirm Email Change", emailBody);
+		BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(newEmail, "🔐 Template: Confirm Email Change", emailBody));
 	}
 }

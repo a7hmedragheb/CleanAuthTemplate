@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
@@ -212,16 +213,7 @@ public class AuthService : IAuthService
 			return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 		}
 
-		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
-			new Dictionary<string, string>
-			{
-				{ "{{FirstName}}", user.FirstName }
-			}
-		);
-
-		await _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody);
-
-		_logger.LogInformation("Email confirmed for user {UserId}", user.Id);
+		await SendWelcomeEmailAsync(user);
 
 		return Result.Success();
 	}
@@ -274,14 +266,7 @@ public class AuthService : IAuthService
 				return Result.Failure<AuthResult>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 			}
 
-			var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
-				new Dictionary<string, string>
-				{
-					{ "{{FirstName}}", user.FirstName }
-				}
-			);
-
-			await _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody);
+			await SendWelcomeEmailAsync(user);
 		}
 
 		var (token, expiresIn) = _jwtProvider.GenerateToken(user);
@@ -347,14 +332,7 @@ public class AuthService : IAuthService
 
 		//send email with 'code' (do not log in production)
 
-		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.ForgetPassword,
-		new Dictionary<string, string>
-		{
-			{ "{{Code}}", code },
-			{ "{{FirstName}}", user.FirstName }
-		});
-
-		await _emailSender.SendEmailAsync(user.Email!, "🔐 Template: Change Password", emailBody);
+		await SendResetPasswordEmailAsync(user, code);
 
 		return Result.Success();
 	}
@@ -497,8 +475,37 @@ public class AuthService : IAuthService
 			}
 		);
 
-		await _emailSender.SendEmailAsync(user.Email!, "✅ Template: Confirm Your Email", emailBody);
+		BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "✅ Template: Confirm Your Email", emailBody));
 
-		_logger.LogInformation("Confirmation email sent to {Email}", user.Email);
+		_logger.LogInformation("Confirmation email enqueued for {Email}", user.Email);
+	}
+
+	private async Task SendWelcomeEmailAsync(ApplicationUser user)
+	{
+		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.Welcome,
+			new Dictionary<string, string>
+			{
+				{ "{{FirstName}}", user.FirstName }
+			}
+		);
+
+		BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "🎉 Welcome to Template", emailBody));
+
+		_logger.LogInformation("Welcome email enqueued for {Email}", user.Email);
+	}
+
+	private async Task SendResetPasswordEmailAsync(ApplicationUser user, string code)
+	{
+		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.ForgetPassword,
+			new Dictionary<string, string>
+			{
+				{ "{{Code}}", code },
+				{ "{{FirstName}}", user.FirstName }
+			}
+		);
+
+		BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "🔐 Template: Change Password", emailBody));
+
+		_logger.LogInformation("Reset password email enqueued for {Email}", user.Email);
 	}
 }
