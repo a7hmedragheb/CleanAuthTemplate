@@ -10,6 +10,7 @@ using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Reflection;
 using System.Text;
 using Template.Api.Authentication;
+using Template.Api.Jobs;
 
 namespace Template.Api;
 public static class DependencyInjection
@@ -129,6 +130,7 @@ public static class DependencyInjection
 
 	private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services,IConfiguration configuration)
 	{
+		// Hangfire
 		services.AddHangfire(config => config
 			.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
 			.UseSimpleAssemblyNameTypeSerializer()
@@ -137,6 +139,8 @@ public static class DependencyInjection
 		);
 
 		services.AddHangfireServer();
+
+		services.AddScoped<CleanUpExpiredRefreshTokensJob>();
 
 		return services;
 	}
