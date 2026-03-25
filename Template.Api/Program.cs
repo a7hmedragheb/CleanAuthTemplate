@@ -1,4 +1,6 @@
 using Hangfire;
+using Hangfire.Dashboard;
+using HangfireBasicAuthenticationFilter;
 using Template.Api;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +24,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseHangfireDashboard("/jobs"); // https://localhost:7131/jobs
+// https://localhost:7131/jobs
+app.UseHangfireDashboard("/jobs", new DashboardOptions
+{
+	Authorization =
+	[
+		new HangfireCustomBasicAuthenticationFilter
+		{
+			User = builder.Configuration.GetValue<string>("HangfireSettings:Username"),
+			Pass = builder.Configuration.GetValue<string>("HangfireSettings:Password"),
+		}
+	],
+	DashboardTitle = "Auth Template Service - Job Dashboard",
+	IsReadOnlyFunc = (DashboardContext context) => true
+});
 
 app.UseCors();
 
