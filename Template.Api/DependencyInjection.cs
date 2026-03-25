@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
+using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Reflection;
@@ -28,8 +30,6 @@ public static class DependencyInjection
 			)
 		);
 
-		//services.AddAuthConfig(configuration);
-
 		var ConnectionString = configuration.GetConnectionString("DefaultConnection") ??
 			throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -50,6 +50,7 @@ public static class DependencyInjection
 
 		services.AddExceptionHandler<GlobalExceptionHandler>();
 		services.AddProblemDetails();
+		services.AddBackgroundJobsConfig(configuration);
 
 		services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
 
@@ -125,4 +126,19 @@ public static class DependencyInjection
 
 		return services;
 	}
+
+	private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services,IConfiguration configuration)
+	{
+		services.AddHangfire(config => config
+			.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+			.UseSimpleAssemblyNameTypeSerializer()
+			.UseRecommendedSerializerSettings()
+			.UseSqlServerStorage(configuration.GetConnectionString("HangfireConnection"))
+		);
+
+		services.AddHangfireServer();
+
+		return services;
+	}
+
 }

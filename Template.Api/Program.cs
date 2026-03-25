@@ -1,3 +1,4 @@
+using Hangfire;
 using Template.Api;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseHangfireDashboard("/jobs"); // https://localhost:7131/jobs
+
+app.UseCors();
 
 app.UseAuthorization();
 
