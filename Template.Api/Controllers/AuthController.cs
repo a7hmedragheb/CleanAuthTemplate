@@ -14,7 +14,7 @@ public class AuthController : ControllerBase
 		_authService = authService;
 	}
 	[HttpPost("")]
-	[EnableRateLimiting("AuthPolicy")]
+	[EnableRateLimiting(RateLimiters.AuthPolicy)]
 	public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
 	{
 		var result = await _authService.GetTokenAsync(request.Email, request.Password, cancellationToken);
@@ -29,7 +29,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("refresh")]
-	[EnableRateLimiting("GeneralPolicy")]
+	[EnableRateLimiting(RateLimiters.GeneralPolicy)]
 	public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
 	{
 		var result = await _authService.GetRefreshTokenAsync(GetTokenFromHeader(), GetRefreshTokenFromCookie()!, cancellationToken);
@@ -45,7 +45,7 @@ public class AuthController : ControllerBase
 
 
 	[HttpPost("revoke-refresh-token")]
-	[EnableRateLimiting("GeneralPolicy")]
+	[EnableRateLimiting(RateLimiters.GeneralPolicy)]
 	public async Task<IActionResult> RevokeRefreshToken(CancellationToken cancellationToken)
 	{
 		var result = await _authService.RevokeRefreshTokenAsync(GetTokenFromHeader(), GetRefreshTokenFromCookie()!, cancellationToken);
@@ -60,7 +60,8 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("register")]
-	[EnableRateLimiting("AuthPolicy")]
+	[EnableRateLimiting(RateLimiters.AuthPolicy)]
+	
 	public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
 	{
 		var result = await _authService.RegisterAsync(request, cancellationToken);
@@ -69,7 +70,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("confirm-email")]
-	[EnableRateLimiting("GeneralPolicy")]
+	[EnableRateLimiting(RateLimiters.GeneralPolicy)]
 	public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
 	{
 		var result = await _authService.ConfirmEmailAsync(request);
@@ -78,7 +79,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("resend-confirmation-email")]
-	[EnableRateLimiting("SensitivePolicy")]
+	[EnableRateLimiting(RateLimiters.SensitivePolicy)]
 	public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendConfirmationEmailRequest request)
 	{
 		var result = await _authService.ResendConfirmationEmailAsync(request);
@@ -86,7 +87,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("forget-password")]
-	[EnableRateLimiting("SensitivePolicy")]
+	[EnableRateLimiting(RateLimiters.SensitivePolicy)]
 	public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordRequest request)
 	{
 		var result = await _authService.SendResetPasswordCodeAsync(request.Email);
@@ -95,7 +96,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("verify-code")]
-	[EnableRateLimiting("SensitivePolicy")]
+	[EnableRateLimiting(RateLimiters.SensitivePolicy)]
 	public async Task<IActionResult> VerifyResetCode([FromBody] VerifyResetCodeRequest request)
 	{
 		var result = await _authService.VerifyResetCodeAsync(request.Email, request.Code);
@@ -104,7 +105,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("reset-password")]
-	[EnableRateLimiting("SensitivePolicy")]
+	[EnableRateLimiting(RateLimiters.SensitivePolicy)]
 	public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
 	{
 		var result = await _authService.ResetPasswordAsync(request.Email, request.Code, request.NewPassword);
@@ -113,7 +114,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("login-google")]
-	[EnableRateLimiting("AuthPolicy")]
+	[EnableRateLimiting(RateLimiters.AuthPolicy)]
 	public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthRequest request, CancellationToken cancellationToken)
 	{
 		var result = await _authService.GoogleLoginAsync(request.IdToken, cancellationToken);

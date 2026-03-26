@@ -162,7 +162,7 @@ public static class DependencyInjection
 			}
 
 			// 30 requests per minute with queuing
-			options.AddPolicy("GeneralPolicy", context =>
+			options.AddPolicy(RateLimiters.GeneralPolicy, context =>
 				RateLimitPartition.GetSlidingWindowLimiter(
 					GetClientKey(context),
 					_ => new SlidingWindowRateLimiterOptions
@@ -176,8 +176,8 @@ public static class DependencyInjection
 				)
 			);
 
-			//  10 requests per minute without queuing
-			options.AddPolicy("AuthPolicy", context =>
+			// 10 requests per minute without queuing
+			options.AddPolicy(RateLimiters.AuthPolicy, context =>
 				RateLimitPartition.GetSlidingWindowLimiter(
 					GetClientKey(context),
 					_ => new SlidingWindowRateLimiterOptions
@@ -191,8 +191,8 @@ public static class DependencyInjection
 				)
 			);
 
-			//  5 requests per minute without queuing
-			options.AddPolicy("SensitivePolicy", context =>
+			// 5 requests per minute without queuing
+			options.AddPolicy(RateLimiters.SensitivePolicy, context =>
 				RateLimitPartition.GetSlidingWindowLimiter(
 					GetClientKey(context),
 					_ => new SlidingWindowRateLimiterOptions
