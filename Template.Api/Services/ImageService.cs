@@ -1,4 +1,6 @@
-﻿namespace Template.Api.Services;
+﻿using Microsoft.AspNetCore.Hosting;
+
+namespace Template.Api.Services;
 
 public class ImageService : IImageService
 {
@@ -22,5 +24,15 @@ public class ImageService : IImageService
 		stream.Dispose();
 
 		return $"/images/{folder}/{fileName}";
+	}
+
+	public Task DeleteAsync(string imageUrl, CancellationToken cancellationToken = default)
+	{
+		var filePath = Path.Combine(_webHostEnvironment.WebRootPath, imageUrl.TrimStart('/'));
+
+		if (File.Exists(filePath))
+			File.Delete(filePath);
+
+		return Task.CompletedTask;
 	}
 }

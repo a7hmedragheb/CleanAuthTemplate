@@ -3,4 +3,5 @@
 public interface IImageService
 {
 	Task<string> UploadAsync(IFormFile file, string folder, CancellationToken cancellationToken = default);
+	Task DeleteAsync(string imageUrl, CancellationToken cancellationToken = default);
 }
