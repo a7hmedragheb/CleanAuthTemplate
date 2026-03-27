@@ -8,7 +8,6 @@ public class UploadImageRequestValidator : AbstractValidator<UploadImageRequest>
 	{
 		RuleFor(x => x.Image)
 			 .NotNull()
-			 .WithMessage("Avatar is required.")
 			 .SetValidator(new FileSizeValidator())
 			 .SetValidator(new FileSignatureValidator());
 	}

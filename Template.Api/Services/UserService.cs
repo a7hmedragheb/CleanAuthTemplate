@@ -11,16 +11,19 @@ namespace Template.Api.Services;
 public class UserService : IUserService
 {
 	private readonly UserManager<ApplicationUser> _userManager;
+	private readonly IImageService _imageService;
 	private readonly ILogger<UserService> _logger;
 	private readonly IEmailSender _emailSender;
 	private readonly AppSettings _appSettings;
 
 	public UserService(UserManager<ApplicationUser> userManager,
+		IImageService imageService,
 		ILogger<UserService> logger,
 		IEmailSender emailSender,
 		IOptions<AppSettings> appSettings)
 	{
 		_userManager = userManager;
+		_imageService = imageService;
 		_logger = logger;
 		_emailSender = emailSender;
 		_appSettings = appSettings.Value;
@@ -51,6 +54,27 @@ public class UserService : IUserService
 			);
 
 		return Result.Success();
+	}
+
+	public async Task<Result<string>> UpdateAvatarAsync(string userId, IFormFile avatar, CancellationToken cancellationToken = default)
+	{
+		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId, cancellationToken: cancellationToken) is not { } user)
+			return Result.Failure<string>(UserErrors.UserNotFound);
+
+		if (!string.IsNullOrEmpty(user.ImageUrl))
+			await _imageService.DeleteAsync(user.ImageUrl, user.ImageThumbnailUrl ?? string.Empty, cancellationToken);
+
+		var imageUrl = await _imageService.UploadAsync(avatar, "Users", hasThumbnail: true, cancellationToken);
+		var imageThumbnailUrl = $"/images/Users/thumb/{Path.GetFileName(imageUrl)}";
+
+		user.ImageUrl = imageUrl;
+		user.ImageThumbnailUrl = imageThumbnailUrl;
+
+		await _userManager.UpdateAsync(user);
+
+		_logger.LogInformation("Avatar updated for user {UserId}", userId);
+
+		return Result.Success(imageUrl);
 	}
 
 	public async Task<Result> ChangePasswordAsync(string userId, ChangePasswordRequest request)
@@ -102,7 +126,7 @@ public class UserService : IUserService
 			return Result.Failure(UserErrors.InvalidCode);
 
 		string decodedToken;
-	
+
 		try
 		{
 			decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));

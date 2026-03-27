@@ -7,5 +7,7 @@ public record UserProfileResponse(
 	string? Email,
 	string? PhoneNumber,
 	DateOnly DateOfBirth,
-	string Gender
+	string Gender,
+	string? ImageUrl,
+	string? ImageThumbnailUrl
 );

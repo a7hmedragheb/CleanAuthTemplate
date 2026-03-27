@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Template.Api.Contracts.Images;
 using Template.Api.Contracts.Users;
 using Template.Api.Extensions;
 
@@ -31,6 +32,13 @@ public class AccountController : ControllerBase
 
 		return result.IsSuccess ? NoContent() : result.ToProblem();
 	}
+
+	[HttpPut("update-profile-image")]
+	public async Task<IActionResult> UpdateAvatar([FromForm] UploadImageRequest request, CancellationToken cancellationToken)
+	{
+		var result = await _userService.UpdateAvatarAsync(User.GetUserId()!, request.Image, cancellationToken);
+		return result.IsSuccess ? Ok(new { imageUrl = result.Value }) : result.ToProblem();
+	}	
 
 	[HttpPut("change-password")]
 	[EnableRateLimiting(RateLimiters.SensitivePolicy)]
