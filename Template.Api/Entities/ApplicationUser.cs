@@ -19,6 +19,8 @@ public sealed class  ApplicationUser : IdentityUser
 	public string? PendingEmail { get; set; }
 	public bool IsDeleted { get; set; }
 	public DateTime? DeletedAt { get; set; }
+	public string? ImageUrl { get; set; }
+	public string? ImageThumbnailUrl { get; set; }
 
 	public List<RefreshToken> RefreshTokens { get; set; } = [];
 }
