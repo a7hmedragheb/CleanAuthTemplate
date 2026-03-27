@@ -1,5 +1,4 @@
-﻿using Bookify.Web.Settings;
-using CloudinaryDotNet;
+﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.Extensions.Options;
 using Template.Api.Contracts.Images;
@@ -37,6 +36,12 @@ public class ImageService(IOptions<CloudinarySettings> cloudinarySettings) : IIm
 			uploadResult.PublicId,
 			thumbnailUrl
 		);
+	}
+
+	public async Task DeleteAsync(string ImagePublicId)
+	{
+		var deleteParams = new DeletionParams(ImagePublicId);
+		await _cloudinary.DestroyAsync(deleteParams);
 	}
 
 	private static string GetThumbnailUrl(string url)

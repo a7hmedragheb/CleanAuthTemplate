@@ -1,5 +1,4 @@
-﻿namespace Bookify.Web.Settings;
-
+﻿namespace Template.Api.Settings;
 public class CloudinarySettings
 {
 	public string CloudName { set; get; } = null!;
