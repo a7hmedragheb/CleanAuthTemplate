@@ -56,10 +56,10 @@ public class UserService : IUserService
 		return Result.Success();
 	}
 
-	public async Task<Result<string>> UpdateAvatarAsync(string userId, IFormFile avatar, CancellationToken cancellationToken = default)
+	public async Task<Result> UpdateAvatarAsync(string userId, IFormFile avatar, CancellationToken cancellationToken = default)
 	{
 		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId, cancellationToken: cancellationToken) is not { } user)
-			return Result.Failure<string>(UserErrors.UserNotFound);
+			return Result.Failure(UserErrors.UserNotFound);
 
 		if (!string.IsNullOrEmpty(user.ImageUrl))
 			await _imageService.DeleteAsync(user.ImageUrl, user.ImageThumbnailUrl ?? string.Empty, cancellationToken);
@@ -74,7 +74,7 @@ public class UserService : IUserService
 
 		_logger.LogInformation("Avatar updated for user {UserId}", userId);
 
-		return Result.Success(imageUrl);
+		return Result.Success();
 	}
 
 	public async Task<Result> ChangePasswordAsync(string userId, ChangePasswordRequest request)
