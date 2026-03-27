@@ -42,6 +42,7 @@ public static class DependencyInjection
 		services.AddScoped<IUserService, UserService>();
 		services.AddScoped<IEmailSender, EmailService>();
 		services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+		services.AddScoped<IImageService, ImageService>();
 
 		services
 			.AddMapsterConfig()
