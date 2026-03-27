@@ -21,6 +21,7 @@ public sealed class  ApplicationUser : IdentityUser
 	public DateTime? DeletedAt { get; set; }
 	public string? ImageUrl { get; set; }
 	public string? ImageThumbnailUrl { get; set; }
+	public string? ImagePublicId { get; set; } 
 
 	public List<RefreshToken> RefreshTokens { get; set; } = [];
 }

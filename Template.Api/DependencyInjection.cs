@@ -1,5 +1,4 @@
-﻿using Bookify.Web.Settings;
-using FluentValidation;
+﻿using FluentValidation;
 using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
