@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Bookify.Web.Settings;
+using FluentValidation;
 using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -61,6 +62,7 @@ public static class DependencyInjection
 
 		services.Configure<AppSettings>(configuration.GetSection(nameof(AppSettings)));
 
+		services.Configure<CloudinarySettings>(configuration.GetSection(nameof(CloudinarySettings)));
 
 		return services;
 	}
