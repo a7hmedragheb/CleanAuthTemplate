@@ -37,7 +37,7 @@ public class AccountController : ControllerBase
 	public async Task<IActionResult> UpdateAvatar([FromForm] UploadImageRequest request, CancellationToken cancellationToken)
 	{
 		var result = await _userService.UpdateAvatarAsync(User.GetUserId()!, request.Image, cancellationToken);
-		return result.IsSuccess ? Ok(new { imageUrl = result.Value }) : result.ToProblem();
+		return result.IsSuccess ? Ok() : result.ToProblem();
 	}	
 
 	[HttpPut("change-password")]

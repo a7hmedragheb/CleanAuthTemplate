@@ -60,9 +60,11 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
-app.UseRateLimiter(); 
-	
 app.UseCors();
+
+app.UseRateLimiter();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

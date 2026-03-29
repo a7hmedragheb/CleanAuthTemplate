@@ -61,6 +61,7 @@ public static class DependencyInjection
 
 		services.Configure<AppSettings>(configuration.GetSection(nameof(AppSettings)));
 
+		services.Configure<CloudinarySettings>(configuration.GetSection(nameof(CloudinarySettings)));
 
 		return services;
 	}
