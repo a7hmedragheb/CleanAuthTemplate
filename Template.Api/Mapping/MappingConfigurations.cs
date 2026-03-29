@@ -12,6 +12,7 @@ public class MappingConfigurations : IRegister
 
 		config.NewConfig<ApplicationUser, UserProfileResponse>()
 				.Map(dest => dest.Gender, src => src.Gender.ToString())
-				.Map(dest => dest.DateOfBirth, src => src.DateOfBirth.ToShortDateString());
+				.Map(dest => dest.DateOfBirth, src => src.DateOfBirth.ToShortDateString())
+				.Map(dest => dest.ImageUrl, src => src.ImageUrl ?? (src.Gender == Gender.Male ? DefaultAvatars.Male : DefaultAvatars.Female));
 	}
 }
