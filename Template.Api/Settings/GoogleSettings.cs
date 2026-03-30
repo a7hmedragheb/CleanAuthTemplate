@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Template.Api.Settings;
+﻿namespace Template.Api.Settings;
 public class GoogleSettings
 {
 	[Required]

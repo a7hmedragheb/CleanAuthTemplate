@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Template.Api.Abstractions.Consts;
 
 namespace Template.Api.Contracts.Auth;
 public class RegisterRequestValidator : AbstractValidator<RegisterRequest>

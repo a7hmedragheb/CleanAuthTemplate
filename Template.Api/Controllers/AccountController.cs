@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using Template.Api.Contracts.Images;
-using Template.Api.Contracts.Users;
 using Template.Api.Extensions;
 
 [Route("/[Controller]")]
@@ -38,7 +35,7 @@ public class AccountController : ControllerBase
 	{
 		var result = await _userService.UpdateAvatarAsync(User.GetUserId()!, request.Image, cancellationToken);
 		return result.IsSuccess ? Ok() : result.ToProblem();
-	}	
+	}
 
 	[HttpPut("change-password")]
 	[EnableRateLimiting(RateLimiters.SensitivePolicy)]

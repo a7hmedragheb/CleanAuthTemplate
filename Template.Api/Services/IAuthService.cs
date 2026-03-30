@@ -1,6 +1,4 @@
-﻿using Template.Api.Contracts.Auth;
-
-namespace Template.Api.Services;
+﻿namespace Template.Api.Services;
 
 public interface IAuthService
 {

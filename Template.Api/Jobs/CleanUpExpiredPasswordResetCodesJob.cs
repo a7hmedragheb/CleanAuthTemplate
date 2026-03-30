@@ -1,6 +1,4 @@
-﻿using Hangfire;
-
-namespace Template.Api.Jobs;
+﻿namespace Template.Api.Jobs;
 public class CleanUpExpiredPasswordResetCodesJob(
 	ApplicationDbContext context,
 	ILogger<CleanUpExpiredPasswordResetCodesJob> logger)

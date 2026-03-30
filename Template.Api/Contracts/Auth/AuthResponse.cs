@@ -10,8 +10,8 @@ public record AuthResponse(
 	string Gender,
 	string Token,
 	int ExpiresIn
-	//string RefreshToken,
-	//DateTime RefreshTokenExpiration
+//string RefreshToken,
+//DateTime RefreshTokenExpiration
 );
 
 public record AuthResult(
