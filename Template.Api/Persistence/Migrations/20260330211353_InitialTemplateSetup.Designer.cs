@@ -12,8 +12,8 @@ using Template.Api.Persistence;
 namespace Template.Api.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260323133254_MakeGenderNullableAndAddPasswordResetQueryFilter")]
-    partial class MakeGenderNullableAndAddPasswordResetQueryFilter
+    [Migration("20260330211353_InitialTemplateSetup")]
+    partial class InitialTemplateSetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -170,6 +170,9 @@ namespace Template.Api.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
@@ -177,13 +180,6 @@ namespace Template.Api.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<DateTime?>("EmailChangeCodeExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EmailChangeCodeHash")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -197,6 +193,15 @@ namespace Template.Api.Persistence.Migrations
 
                     b.Property<int?>("Gender")
                         .HasColumnType("int");
+
+                    b.Property<string>("ImagePublicId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageThumbnailUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -240,6 +245,9 @@ namespace Template.Api.Persistence.Migrations
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
