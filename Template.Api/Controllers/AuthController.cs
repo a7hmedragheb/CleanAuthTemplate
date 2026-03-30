@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
+﻿namespace Template.Api.Controllers;
 
-namespace Template.Api.Controllers;
 [Route("[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
@@ -61,7 +59,7 @@ public class AuthController : ControllerBase
 
 	[HttpPost("register")]
 	[EnableRateLimiting(RateLimiters.AuthPolicy)]
-	
+
 	public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
 	{
 		var result = await _authService.RegisterAsync(request, cancellationToken);

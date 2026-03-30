@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Hangfire;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;

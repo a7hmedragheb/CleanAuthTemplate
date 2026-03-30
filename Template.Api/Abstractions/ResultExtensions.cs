@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Template.Api.Abstractions;
+﻿namespace Template.Api.Abstractions;
 
 public static class ResultExtensions
 {

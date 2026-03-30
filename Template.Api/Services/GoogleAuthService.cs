@@ -1,5 +1,4 @@
 ﻿using Google.Apis.Auth;
-using Microsoft.Extensions.Options;
 
 namespace Template.Api.Services;
 public class GoogleAuthService : IGoogleAuthService
@@ -24,7 +23,7 @@ public class GoogleAuthService : IGoogleAuthService
 		}
 		catch
 		{
-			return null; 
+			return null;
 		}
 	}
 }

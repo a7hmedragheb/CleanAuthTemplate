@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Template.Api.Authentication;
+﻿namespace Template.Api.Authentication;
 
 public class JwtOptions
 {

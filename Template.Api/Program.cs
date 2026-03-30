@@ -1,4 +1,3 @@
-using Hangfire;
 using HangfireBasicAuthenticationFilter;
 using Template.Api;
 using Template.Api.Jobs;

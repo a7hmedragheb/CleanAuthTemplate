@@ -1,6 +1,5 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using Microsoft.Extensions.Options;
 using Template.Api.Contracts.Images;
 
 namespace Template.Api.Services;
@@ -12,7 +11,7 @@ public class ImageService(IOptions<CloudinarySettings> cloudinarySettings) : IIm
 		cloudinarySettings.Value.ApiKey,
 		cloudinarySettings.Value.ApiSecret
 	));
-	public async Task<UploadImageResult> UploadAsync(IFormFile file,string folder, bool hasThumbnail = false, CancellationToken cancellationToken = default)
+	public async Task<UploadImageResult> UploadAsync(IFormFile file, string folder, bool hasThumbnail = false, CancellationToken cancellationToken = default)
 	{
 		await using var stream = file.OpenReadStream();
 

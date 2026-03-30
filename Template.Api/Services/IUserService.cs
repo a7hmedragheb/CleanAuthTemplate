@@ -1,6 +1,4 @@
-﻿using Template.Api.Contracts.Users;
-
-namespace Template.Api.Services;
+﻿namespace Template.Api.Services;
 
 public interface IUserService
 {
@@ -10,5 +8,5 @@ public interface IUserService
 	Task<Result> ChangePasswordAsync(string userId, ChangePasswordRequest request);
 	Task<Result> SendChangeEmailCodeAsync(string userId, string newEmail);
 	Task<Result> ConfirmEmailChangeAsync(string userId, ConfirmEmailChangeRequest request);
-	Task<Result> DeleteAccountAsync(string userId, string password);              
+	Task<Result> DeleteAccountAsync(string userId, string password);
 }
