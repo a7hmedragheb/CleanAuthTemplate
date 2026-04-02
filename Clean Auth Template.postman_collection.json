@@ -1,0 +1,606 @@
+{
+  "info": {
+    "_postman_id": "c35e8f52-e50a-4576-bcc6-9ec9c0d6ee26",
+    "name": "Clean Auth Template",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "43514269",
+    "_collection_link": "https://go.postman.co/collection/43514269-c35e8f52-e50a-4576-bcc6-9ec9c0d6ee26?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Author",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"ahmedragheb090@gmail.com\",\r\n    \"Password\": \"P@ssword1234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/auth",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "auth"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Refresh Token",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTE1ZS1iZmQxLTc2OTMtODk0OC0yZGFkOTQ0YjJkODciLCJlbWFpbCI6ImFobWVkQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJBaG1lZCIsImZhbWlseV9uYW1lIjoiUmFnaGViIiwiZ2VuZGVyIjoiTWFsZSIsImJpcnRoZGF0ZSI6IjE5OTUtMDUtMTUiLCJqdGkiOiIwMTlkMWIwNC0yZDk2LTcwOWItOWE0OC1hMTAyZDVlYmQxMzciLCJleHAiOjE3NzQyNzY1NTEsImlzcyI6IlRlbXBsYXRlIiwiYXVkIjoiVGVtcGxhdGUgdXNlcnMifQ.YG0Xt5gdd1KKmSeYIYOcPQCvu8JSOQtFSxGaQtEnacE",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/auth/refresh",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Refresh Token",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTE1ZS1iZmQxLTc2OTMtODk0OC0yZGFkOTQ0YjJkODciLCJlbWFpbCI6ImFobWVkQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJBaG1lZCIsImZhbWlseV9uYW1lIjoiUmFnaGViIiwiZ2VuZGVyIjoiTWFsZSIsImJpcnRoZGF0ZSI6IjE5OTUtMDUtMTUiLCJqdGkiOiIwMTlkMWIwNi1mZjMzLTc5NTgtOTFjZC1iMzdjNzVhN2M5YjMiLCJleHAiOjE3NzQyNzY3MzYsImlzcyI6IlRlbXBsYXRlIiwiYXVkIjoiVGVtcGxhdGUgdXNlcnMifQ._KnuB18_Aieo90PfA96JIkqbN4nR3QQbn9LpiSLPyVk",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/auth/revoke-refresh-token",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "auth",
+                "revoke-refresh-token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"ahmedragheb090@gmail.com\",\r\n    \"firstName\": \"Ahmed\",\r\n    \"lastName\": \"Ragheb\",\r\n    \"gender\": 0,\r\n    \"phoneNumber\": \"01519856195\",\r\n    \"dateOfBirth\": \"2003-12-17\",\r\n    \"password\": \"P@ssword123\",\r\n    \"ConfirmPassword\": \"P@ssword123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/auth/register",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"userId\": \"019d261b-eb3c-79dc-a497-24ed48b58baf \",\r\n    \"code\":\"Q2ZESjhJOHNwSVMvT0k5Tm1sdmZ6S3hlbUY4ZmpmaDFEalBJSU9pNW8zQndlS0c0d2w4OWFCZW9rd2dxQ1hySiticVZESStMeUxzRHZIaUJkTWkxZW84L1c0M2lxZ3F0UEF2aEhEclNWS2ZFZDlpTGpJOTRqUHo2L1B3Q25yb2puOFNWU1ZycGZuclkzS0Z4QzJqR29FSEM3bEpiMi9oSnVBNHRPdzJLNUZ5dk54Uy9GNmoxZ3N6TDEvbkxFZEJDR1J4ZlZkcWY4QTNVT0lSUWxJM2wzMkFaZVA1elB1Q1pOOW9wSW9QMGF5a0pIU1dVbG5XL05BTHRUOVBpeVRaaFpkL3Fndz09\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/auth/confirm-email",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "auth",
+                "confirm-email"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resend Confirmation Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\":\"a7hmedragheb@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/auth/resend-confirmation-email",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "auth",
+                "resend-confirmation-email"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forget Password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"test@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/auth/forget-password",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "auth",
+                "forget-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Code",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"ahmedragheb090@gmail.com\",\r\n    \"code\": \"884042\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/auth/verify-code",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "auth",
+                "verify-code"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"ahmedragheb090@gmail.com\",\r\n    \"code\": \"884042\",\r\n    \"newPassword\": \"P@ssword1234\",\r\n    \"ConfirmPassword\": \"P@ssword1234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/auth/reset-password",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "auth",
+                "reset-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login With Google",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"IdToken\": \"eyJhbGciOiJSUzI1NiIsImtpZCI6ImM0MWYxNDFhYTE5ZGYwYWM5N2RhYTU1ZTYwMDc2NmM0YzUzNjRjNDIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIxOTAwMzE3MTQ0NzItYjNpamJvZzgxMzNraDl1OW1qaHYyMDhrNXNlYzhvbTAuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIxOTAwMzE3MTQ0NzItYjNpamJvZzgxMzNraDl1OW1qaHYyMDhrNXNlYzhvbTAuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTQ4NDk5OTkxNDQ2NTM4MzM5NzgiLCJlbWFpbCI6ImFobWVkcmFnaGViMDkwQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiZnJ5LTM4OVEzenJYd3JNQ09SaXp1ZyIsIm5hbWUiOiJBaG1lZCBSYWdoZWIiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSlVEZmdaMkpZMjFVQUJKM1llNVNLZzdLX2RGTDFwVmdtMV9iQk5hRVRZbFRJWjlRPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IkFobWVkIiwiZmFtaWx5X25hbWUiOiJSYWdoZWIiLCJpYXQiOjE3NzQyNjA1NzIsImV4cCI6MTc3NDI2NDE3Mn0.1y5Hj2dsktL6vPp8Oh_LAuEGlzbqIH9KzYnpKzmSJt-cf7Q-nN-kHTW1jlApz2QFt2JeqKWj0H6XUdzjSk_y_4TSAz5P-AS-v-7ngwYuRv-_yqS-cYWExvpvLcQn_5_W-oBmUKMiU5eGgxxhZtyZ7jPyVjjB9Gwp0ThPQZbSFOwMUu1kFPZ3ZuIyAlhiTWUNbvDjBplY1AmlyLvHsakpFOawGZWSCoCJySeFQujP_lRUSDnR4rVIbWcrt2JQJgeI6LEBO4ZUjjokupgvxm6qVrhXz2mRrAXb0FC_tbIT_JxNlgGnyLtlEoK2Xev5lS1rfcuNNZFQ0Mp4Av1L3d1Lag\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/auth/login-google",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "auth",
+                "login-google"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Account",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTE1ZS1iZmQxLTc2OTMtODk0OC0yZGFkOTQ0YjJkODciLCJlbWFpbCI6ImE3aG1lZHJhZ2hlYkBnbWFpbC5jb20iLCJnaXZlbl9uYW1lIjoiQWhtZWQiLCJmYW1pbHlfbmFtZSI6IlJhZ2hlYiIsImdlbmRlciI6Ik1hbGUiLCJiaXJ0aGRhdGUiOiIxOTk1LTA1LTE1IiwianRpIjoiMDE5ZDIxNjAtZWRhYy03YjI4LTgxNzItNzU5NzdmZDM4M2FjIiwiZXhwIjoxNzc0MzgzMjkzLCJpc3MiOiJUZW1wbGF0ZSIsImF1ZCI6IlRlbXBsYXRlIHVzZXJzIn0.w4GMkGi2e8FiX4J7Seb2ylkMDU33fAymnCXhLFgSlNs",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/Account/profile",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "Account",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTgzMC1mYzUxLTc4YTktODgzMi0xZWZkNjZhMTVhY2YiLCJlbWFpbCI6ImFobWVkcmFnaGViMDkwQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJBaG1lZCIsImZhbWlseV9uYW1lIjoiUmFnaGViIiwiZ2VuZGVyIjoiTWFsZSIsImJpcnRoZGF0ZSI6IjAwMDEtMDEtMDEiLCJqdGkiOiIwMTlkMWEyYy0wNGFhLTdiMzgtYTFmOC0zMDY3NTQ5MGZkOWUiLCJleHAiOjE3NzQyNjIzODUsImlzcyI6IlRlbXBsYXRlIiwiYXVkIjoiVGVtcGxhdGUgdXNlcnMifQ.NA6I_15HT4yXcbJvW2OoL4SsbxMI5sly6FKtn_cK034",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"Ahmed\",\r\n    \"lastName\": \"Ragheb\",\r\n    \"phoneNumber\": \"01519856195\",\r\n    \"dateOfBirth\": \"2003-12-17\",\r\n    \"gender\": 0\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/Account/update-profile",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "Account",
+                "update-profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile Image",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTgzMC1mYzUxLTc4YTktODgzMi0xZWZkNjZhMTVhY2YiLCJlbWFpbCI6ImFobWVkcmFnaGViMDkwQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJBaG1lZCIsImZhbWlseV9uYW1lIjoiUmFnaGViIiwiZ2VuZGVyIjoiTWFsZSIsImJpcnRoZGF0ZSI6IjAwMDEtMDEtMDEiLCJqdGkiOiIwMTlkMWEyYy0wNGFhLTdiMzgtYTFmOC0zMDY3NTQ5MGZkOWUiLCJleHAiOjE3NzQyNjIzODUsImlzcyI6IlRlbXBsYXRlIiwiYXVkIjoiVGVtcGxhdGUgdXNlcnMifQ.NA6I_15HT4yXcbJvW2OoL4SsbxMI5sly6FKtn_cK034",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\": \"Ahmed\",\r\n    \"lastName\": \"Ragheb\",\r\n    \"phoneNumber\": \"01519856195\",\r\n    \"dateOfBirth\": \"2003-12-17\",\r\n    \"gender\": 0\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/Account/update-avatar",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "Account",
+                "update-avatar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTgzMC1mYzUxLTc4YTktODgzMi0xZWZkNjZhMTVhY2YiLCJlbWFpbCI6ImFobWVkcmFnaGViMDkwQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJBaG1lZCIsImZhbWlseV9uYW1lIjoiUmFnaGViIiwiZ2VuZGVyIjoiTWFsZSIsImJpcnRoZGF0ZSI6IjAwMDEtMDEtMDEiLCJqdGkiOiIwMTlkMTgzMy1jMTE4LTc4ZTktODQ1Ni0yN2NjYmRkNjI1NzgiLCJleHAiOjE3NzQyMjkzMzgsImlzcyI6IlRlbXBsYXRlIiwiYXVkIjoiVGVtcGxhdGUgdXNlcnMifQ.XWSdF7K3KT4dXdsCLemqScY2kIfXgVMKhbNUhzdch08",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"currentPassword\": \"P@ssword123\",\r\n    \"newPassword\": \"P@ssword1234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/Account/change-password",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "Account",
+                "change-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Email",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTE1ZS1iZmQxLTc2OTMtODk0OC0yZGFkOTQ0YjJkODciLCJlbWFpbCI6ImFobWVkQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJBaG1lZCIsImZhbWlseV9uYW1lIjoiUmFnaGViIiwiZ2VuZGVyIjoiTWFsZSIsImJpcnRoZGF0ZSI6IjE5OTUtMDUtMTUiLCJqdGkiOiIwMTlkMjE1Mi02NGRlLTdmMzYtODA5MC1jOWI3N2I3N2Y2OWQiLCJleHAiOjE3NzQzODIzNDEsImlzcyI6IlRlbXBsYXRlIiwiYXVkIjoiVGVtcGxhdGUgdXNlcnMifQ.jmkWZSUgAOJFPZIqd8y1ZbYHkRIa1FN6WGLCoOIJpjI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"newEmail\": \"newemail@example.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/Account/change-email",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "Account",
+                "change-email"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Email Change",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTE1ZS1iZmQxLTc2OTMtODk0OC0yZGFkOTQ0YjJkODciLCJlbWFpbCI6ImFobWVkQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJBaG1lZCIsImZhbWlseV9uYW1lIjoiUmFnaGViIiwiZ2VuZGVyIjoiTWFsZSIsImJpcnRoZGF0ZSI6IjE5OTUtMDUtMTUiLCJqdGkiOiIwMTlkMjE1Mi02NGRlLTdmMzYtODA5MC1jOWI3N2I3N2Y2OWQiLCJleHAiOjE3NzQzODIzNDEsImlzcyI6IlRlbXBsYXRlIiwiYXVkIjoiVGVtcGxhdGUgdXNlcnMifQ.jmkWZSUgAOJFPZIqd8y1ZbYHkRIa1FN6WGLCoOIJpjI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"NewEmail\": \"a7hmedragheb@gmail.com\",\r\n    \"token\": \"Q2ZESjhJOHNwSVMvT0k5Tm1sdmZ6S3hlbUY5NXhnK1hpSEd6RnBJb2hkTnoyS0dUNWpHMm5rM3hVUjlvNUd5Q29kcGZJZ1VtSGd6VUN4K1pTeTNOUW9WVzd0cE9jYy9oNGVtNnE1OEhQMkRYL2VRclp3b0lPdy8xa1FZS1JsQ1docVRyTnhSdXFxSmF5NkJlSWlPQlBWeUsxbmFUcWVCZ1dZeFlWUzRXeSthVzc2dXRMTzR3MGFKSC9HRXZBVDVPOGxaY1Y2Mk1mUGprWithVHVrTXA1Vi9LRm82djN3SWxqT1FhVVZZS3NkcHNkK1RVZFlBTnRtV25jUzNLY2F4dkZFQm03Q01kczVLbVFMdndOZ0o5RWd5Z3lIQT0\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/Account/confirm-email-change",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "Account",
+                "confirm-email-change"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTU3NS0xODM5LTc0ZjgtYWI0ZS1iMmZkNzVkNjg1MzciLCJlbWFpbCI6ImE3aG1lZHJhZ2hlYkBnbWFpbC5jb20iLCJnaXZlbl9uYW1lIjoiQWhtZWQiLCJmYW1pbHlfbmFtZSI6IlJhZ2hlYiIsImdlbmRlciI6Ik1hbGUiLCJiaXJ0aGRhdGUiOiIyMDAzLTEyLTE3IiwianRpIjoiMDE5ZDE2OTctMmI3Zi03NTA2LTgyYzUtYjc0OTNkMjYxNTM0IiwiZXhwIjoxNzc0MjAyMjk5LCJpc3MiOiJUZW1wbGF0ZSIsImF1ZCI6IlRlbXBsYXRlIHVzZXJzIn0.Oulnams4eII_j-VYBiRTO2Cu9gXcxOqTaN9U4Ya1Z2E",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"Password\": \"P@ssword1234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://localhost:7131/Account/delete-account",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "7131",
+              "path": [
+                "Account",
+                "delete-account"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
