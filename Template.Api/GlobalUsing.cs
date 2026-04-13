@@ -1,11 +1,15 @@
-﻿global using Hangfire;
+﻿global using FluentValidation;
+global using Hangfire;
 global using Mapster;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.AspNetCore.Identity.UI.Services;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.RateLimiting;
+global using Microsoft.AspNetCore.WebUtilities;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Options;
 global using System.ComponentModel.DataAnnotations;
-
+global using System.Text;
 global using Template.Api.Abstractions;
 global using Template.Api.Abstractions.Consts;
 global using Template.Api.Authentication;
@@ -13,7 +17,9 @@ global using Template.Api.Contracts.Auth;
 global using Template.Api.Contracts.Users;
 global using Template.Api.Entities;
 global using Template.Api.Errors;
+global using Template.Api.Extensions;
 global using Template.Api.Helpers;
+global using Template.Api.Jobs;
 global using Template.Api.Persistence;
 global using Template.Api.Services;
 global using Template.Api.Settings;

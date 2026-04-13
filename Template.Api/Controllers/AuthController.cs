@@ -59,7 +59,6 @@ public class AuthController : ControllerBase
 
 	[HttpPost("register")]
 	[EnableRateLimiting(RateLimiters.AuthPolicy)]
-
 	public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
 	{
 		var result = await _authService.RegisterAsync(request, cancellationToken);

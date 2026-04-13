@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace Template.Api.Entities;
+﻿namespace Template.Api.Entities;
 
 public sealed class ApplicationUser : IdentityUser
 {

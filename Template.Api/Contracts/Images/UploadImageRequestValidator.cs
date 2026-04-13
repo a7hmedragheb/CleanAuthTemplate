@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Template.Api.Contracts.Images.common;
+﻿using Template.Api.Contracts.Images.common;
 
 namespace Template.Api.Contracts.Images;
 public class UploadImageRequestValidator : AbstractValidator<UploadImageRequest>

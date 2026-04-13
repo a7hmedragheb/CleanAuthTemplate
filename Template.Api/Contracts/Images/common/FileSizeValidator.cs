@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Template.Api.Contracts.Images.common;
+﻿namespace Template.Api.Contracts.Images.common;
 public class FileSizeValidator : AbstractValidator<IFormFile>
 {
 	public FileSizeValidator()

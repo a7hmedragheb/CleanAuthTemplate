@@ -1,12 +1,10 @@
 using HangfireBasicAuthenticationFilter;
 using Template.Api;
-using Template.Api.Jobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -21,20 +19,6 @@ if (app.Environment.IsDevelopment())
 	app.MapOpenApi();
 }
 
-
-// https://localhost:7131/jobs
-app.UseHangfireDashboard("/jobs", new DashboardOptions
-{
-	Authorization =
-	[
-		new HangfireCustomBasicAuthenticationFilter
-		{
-			User = builder.Configuration.GetValue<string>("HangfireSettings:Username"),
-			Pass = builder.Configuration.GetValue<string>("HangfireSettings:Password"),
-		}
-	],
-	DashboardTitle = "Auth Template Service - Job Dashboard",
-});
 
 // Recurring Jobs
 using (var scope = app.Services.CreateScope())
@@ -57,6 +41,8 @@ using (var scope = app.Services.CreateScope())
 	);
 }
 
+app.UseExceptionHandler();
+
 app.UseHttpsRedirection();
 
 app.UseCors();
@@ -67,7 +53,20 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.UseExceptionHandler();
+// https://localhost:7131/jobs
+app.UseHangfireDashboard("/jobs", new DashboardOptions
+{
+	Authorization =
+	[
+		new HangfireCustomBasicAuthenticationFilter
+		{
+			User = builder.Configuration.GetValue<string>("HangfireSettings:Username"),
+			Pass = builder.Configuration.GetValue<string>("HangfireSettings:Password"),
+		}
+	],
+	DashboardTitle = "Auth Template Service - Job Dashboard",
+	IsReadOnlyFunc = (context) => true
+});
 
 app.MapControllers();
 

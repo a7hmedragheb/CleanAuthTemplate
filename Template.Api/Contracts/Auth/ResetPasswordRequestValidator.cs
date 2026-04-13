@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Template.Api.Contracts.Auth;
+﻿namespace Template.Api.Contracts.Auth;
 public class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequest>
 {
 	public ResetPasswordRequestValidator()

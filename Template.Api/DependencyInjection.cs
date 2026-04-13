@@ -1,15 +1,10 @@
-﻿using FluentValidation;
-using MapsterMapper;
+﻿using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Reflection;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.RateLimiting;
-using Template.Api.Jobs;
+
 
 namespace Template.Api;
 public static class DependencyInjection
@@ -158,7 +153,7 @@ public static class DependencyInjection
 			static string GetClientKey(HttpContext context)
 			{
 				return context.User.Identity?.IsAuthenticated == true
-					? context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!
+					? context.User.GetUserId()!
 					: context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 			}
 

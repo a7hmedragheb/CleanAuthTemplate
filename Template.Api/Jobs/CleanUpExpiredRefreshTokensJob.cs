@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace Template.Api.Jobs;
+﻿namespace Template.Api.Jobs;
 
 public class CleanUpExpiredRefreshTokensJob(
 	UserManager<ApplicationUser> userManager,
