@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Template.Api.Contracts.Users;
+﻿namespace Template.Api.Contracts.Users;
 
 public class ConfirmEmailChangeRequestValidator : AbstractValidator<ConfirmEmailChangeRequest>
 {

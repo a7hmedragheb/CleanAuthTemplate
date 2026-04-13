@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Text;
-
-namespace Template.Api.Services;
-
+﻿namespace Template.Api.Services;
 public class UserService : IUserService
 {
 	private readonly UserManager<ApplicationUser> _userManager;

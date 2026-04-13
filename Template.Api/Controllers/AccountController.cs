@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Template.Api.Contracts.Images;
-using Template.Api.Extensions;
 
 [Route("/[Controller]")]
 [ApiController]
