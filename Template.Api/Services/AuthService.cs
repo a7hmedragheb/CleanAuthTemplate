@@ -417,7 +417,7 @@ public class AuthService : IAuthService
 		return (user, resetEntry);
 	}
 
-	private static readonly char[] _allowedNumber = AllowedNumber._allowedNumber;
+	private static readonly char[] _allowedNumber = OtpConstants.Digits;
 	private static string GenerateVerificationCode(int length = 6)
 	{
 		var codeDigits = new char[length];

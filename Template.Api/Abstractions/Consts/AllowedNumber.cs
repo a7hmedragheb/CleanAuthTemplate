@@ -1,6 +1,6 @@
 ﻿namespace Template.Api.Abstractions.Consts;
 
-public static class AllowedNumber
+public static class OtpConstants
 {
-	public static readonly char[] _allowedNumber = "0123456789".ToCharArray();
+	public static readonly char[] Digits = "0123456789".ToCharArray();
 }

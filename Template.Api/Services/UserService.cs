@@ -32,6 +32,12 @@ public class UserService : IUserService
 
 	public async Task<Result> UpdateProfileAsync(string userId, UpdateProfileRequest request)
 	{
+		var phoneNumberIsExists = await _userManager.Users
+			.AnyAsync(x => x.PhoneNumber == request.PhoneNumber && x.Id != userId);
+
+		if (phoneNumberIsExists)
+			return Result.Failure<UserProfileResponse>(UserErrors.DuplicatedPhoneNumber);
+
 		await _userManager.Users
 			.Where(x => x.Id == userId)
 			.ExecuteUpdateAsync(setters =>
