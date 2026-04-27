@@ -17,8 +17,6 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 		builder.Property(u => u.DateOfBirth)
 			.IsRequired();
 
-		builder.Property(u => u.Gender);
-
 		builder
 			.OwnsMany(u => u.RefreshTokens)
 			.ToTable("RefreshTokens")
@@ -31,8 +29,6 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 		builder.Property(u => u.IsDeleted)
 			.IsRequired()
 			.HasDefaultValue(false);
-
-		builder.Property(u => u.DeletedAt);
 
 		// Global Filter for disappear Deleted Users Query Results
 		builder.HasQueryFilter(u => !u.IsDeleted);

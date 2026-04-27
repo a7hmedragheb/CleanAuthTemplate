@@ -11,6 +11,7 @@ public class AuthController : ControllerBase
 	{
 		_authService = authService;
 	}
+
 	[HttpPost("")]
 	[EnableRateLimiting(RateLimiters.AuthPolicy)]
 	public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
