@@ -6,7 +6,7 @@ namespace Template.Api.Persistence;
 
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) :
-	IdentityDbContext<ApplicationUser>(options)
+	IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
 {
 	public DbSet<PasswordResetCode> PasswordResetCodes { get; set; }
 

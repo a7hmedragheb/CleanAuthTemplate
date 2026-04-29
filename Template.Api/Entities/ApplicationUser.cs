@@ -23,10 +23,3 @@ public sealed class ApplicationUser : IdentityUser
 
 	public List<RefreshToken> RefreshTokens { get; set; } = [];
 }
-
-public enum Gender
-{
-	Male,
-	Female
-}
-
