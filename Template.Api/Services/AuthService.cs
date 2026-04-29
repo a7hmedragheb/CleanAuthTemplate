@@ -45,7 +45,9 @@ public class AuthService : IAuthService
 		if (!isPasswordValid)
 			return Result.Failure<AuthResult>(UserErrors.InvalidCredentials);
 
-		var (token, expiresIn) = _jwtProvider.GenerateToken(user);
+		var userRoles = await _userManager.GetRolesAsync(user);
+
+		var (token, expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
 
 		var refreshToken = GenerateRefreshToken();
 		var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
@@ -98,7 +100,9 @@ public class AuthService : IAuthService
 
 		userRefreshToken.RevokedOn = DateTime.UtcNow;
 
-		var (newToken, expiresIn) = _jwtProvider.GenerateToken(user);
+		var userRoles = await _userManager.GetRolesAsync(user);
+
+		var (newToken, expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
 		var newRefreshToken = GenerateRefreshToken();
 		var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 
@@ -259,6 +263,9 @@ public class AuthService : IAuthService
 
 			var createResult = await _userManager.CreateAsync(user);
 
+			await _userManager.AddToRoleAsync(user, DefaultRoles.Member.Name);
+
+
 			if (!createResult.Succeeded)
 			{
 				var error = createResult.Errors.First();
@@ -268,7 +275,9 @@ public class AuthService : IAuthService
 			await SendWelcomeEmailAsync(user);
 		}
 
-		var (token, expiresIn) = _jwtProvider.GenerateToken(user);
+		var userRoles = await _userManager.GetRolesAsync(user);
+
+		var (token, expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
 		var refreshToken = GenerateRefreshToken();
 		var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 

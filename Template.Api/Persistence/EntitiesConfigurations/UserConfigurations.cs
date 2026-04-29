@@ -40,6 +40,8 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 			Id = DefaultUsers.Admin.Id,
 			FirstName = DefaultUsers.Admin.FirstName,
 			LastName = DefaultUsers.Admin.LastName,
+			Gender = DefaultUsers.Admin.gender,
+			PhoneNumber = DefaultUsers.Admin.PhoneNumber,
 			UserName = DefaultUsers.Admin.Email,
 			NormalizedUserName = DefaultUsers.Admin.Email.ToUpper(),
 			Email = DefaultUsers.Admin.Email,
