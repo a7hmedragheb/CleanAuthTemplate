@@ -46,17 +46,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 			}
 		}
 
-		// ApplicationUser
-		var userEntries = ChangeTracker.Entries<ApplicationUser>();
-		foreach (var entityEntry in userEntries)
-		{
-			if (entityEntry.State == EntityState.Added)
-				entityEntry.Property(x => x.CreatedOn).CurrentValue = DateTime.UtcNow;
-
-			else if (entityEntry.State == EntityState.Modified)
-				entityEntry.Property(x => x.UpdatedOn).CurrentValue = DateTime.UtcNow;
-		}
-
 		return base.SaveChangesAsync(cancellationToken);
 	}
 }

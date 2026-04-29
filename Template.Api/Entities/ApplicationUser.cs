@@ -8,8 +8,6 @@ public sealed class ApplicationUser : IdentityUser
 		SecurityStamp = Guid.CreateVersion7().ToString();
 	}
 
-	public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
-	public DateTime? UpdatedOn { get; set; }
 	public string FirstName { get; set; } = string.Empty;
 	public string LastName { get; set; } = string.Empty;
 	public DateTime DateOfBirth { get; set; }
