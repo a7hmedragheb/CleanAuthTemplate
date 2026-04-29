@@ -189,10 +189,11 @@ public class AuthService : IAuthService
 		if (user.EmailConfirmed)
 			return Result.Failure(UserErrors.DuplicatedConfirmation);
 
-		string code;
+		string code = request.Code;
+
 		try
 		{
-			code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
+			code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
 		}
 		catch (FormatException)
 		{
@@ -201,15 +202,19 @@ public class AuthService : IAuthService
 
 		var result = await _userManager.ConfirmEmailAsync(user, code);
 
-		if (!result.Succeeded)
+
+		if (result.Succeeded)
 		{
-			var error = result.Errors.First();
-			return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+			await _userManager.AddToRoleAsync(user, DefaultRoles.Member.Name);
+
+			await SendWelcomeEmailAsync(user);
+
+			return Result.Success();
 		}
 
-		await SendWelcomeEmailAsync(user);
-
-		return Result.Success();
+		var error = result.Errors.First(); 
+		
+		return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 	}
 
 	public async Task<Result> ResendConfirmationEmailAsync(ResendConfirmationEmailRequest request)
