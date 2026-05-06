@@ -15,4 +15,14 @@ public class RoleService : IRoleService
 		 .Where(x => !x.IsDefault && (!x.IsDeleted || (includeDisabled.HasValue && includeDisabled.Value)))
 		 .ProjectToType<RoleResponse>()
 		 .ToListAsync(cancellationToken);
+
+	public async Task<Result<RoleResponse>> GetAsync(string id)
+	{
+		if (await _roleManager.FindByIdAsync(id) is not { } role)
+			return Result.Failure<RoleResponse>(RoleErrors.RoleNotFound);
+
+		var response = new RoleResponse(role.Id, role.Name!, role.IsDeleted);
+
+		return Result.Success(response);
+	}
 }
