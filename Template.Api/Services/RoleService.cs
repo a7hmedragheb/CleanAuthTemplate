@@ -25,4 +25,31 @@ public class RoleService : IRoleService
 
 		return Result.Success(response);
 	}
+
+	public async Task<Result<RoleResponse>> AddAsync(RoleRequest request)
+	{
+		var roleIsExists = await _roleManager.RoleExistsAsync(request.Name);
+
+		if (roleIsExists)
+			return Result.Failure<RoleResponse>(RoleErrors.DuplicatedRole);
+
+		var role = new ApplicationRole
+		{
+			Name = request.Name,
+			ConcurrencyStamp = Guid.CreateVersion7().ToString()
+		};
+
+		var result = await _roleManager.CreateAsync(role);
+
+		if (result.Succeeded)
+		{
+			var response = new RoleResponse(role.Id, role.Name, role.IsDeleted);
+
+			return Result.Success(response);
+		}
+
+		var error = result.Errors.First();
+
+		return Result.Failure<RoleResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+	}
 }

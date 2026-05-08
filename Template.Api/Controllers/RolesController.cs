@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Template.Api.Contracts.Roles;
 
 
 [Route("api/[controller]")]
@@ -26,5 +27,13 @@ public class RolesController : ControllerBase
 		var result = await _roleService.GetAsync(id);
 
 		return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+	}
+
+	[HttpPost("")]
+	public async Task<IActionResult> Add([FromBody] RoleRequest request)
+	{
+		var result = await _roleService.AddAsync(request);
+
+		return result.IsSuccess ? CreatedAtAction(nameof(Get), new { result.Value.Id }, result.Value) : result.ToProblem();
 	}
 }
