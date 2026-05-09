@@ -37,4 +37,13 @@ public class UsersController : ControllerBase
 
 		return result.IsSuccess ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value) : result.ToProblem();
 	}
+
+	[HttpPut("{id}")]
+	public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateUserRequest request, CancellationToken cancellationToken)
+	{
+		var result = await _userService.UpdateAsync(id, request, cancellationToken);
+
+		return result.IsSuccess ? NoContent() : result.ToProblem();
+
+	}
 }
