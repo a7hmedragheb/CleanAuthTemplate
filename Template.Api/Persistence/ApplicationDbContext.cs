@@ -6,7 +6,7 @@ namespace Template.Api.Persistence;
 
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor) :
-	IdentityDbContext<ApplicationUser>(options)
+	IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
 {
 	public DbSet<PasswordResetCode> PasswordResetCodes { get; set; }
 
@@ -44,17 +44,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 				entityEntry.Property(x => x.UpdatedById).CurrentValue = currentUserId;
 				entityEntry.Property(x => x.UpdatedOn).CurrentValue = DateTime.UtcNow;
 			}
-		}
-
-		// ApplicationUser
-		var userEntries = ChangeTracker.Entries<ApplicationUser>();
-		foreach (var entityEntry in userEntries)
-		{
-			if (entityEntry.State == EntityState.Added)
-				entityEntry.Property(x => x.CreatedOn).CurrentValue = DateTime.UtcNow;
-
-			else if (entityEntry.State == EntityState.Modified)
-				entityEntry.Property(x => x.UpdatedOn).CurrentValue = DateTime.UtcNow;
 		}
 
 		return base.SaveChangesAsync(cancellationToken);

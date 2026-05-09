@@ -16,6 +16,7 @@ global using Template.Api.Authentication;
 global using Template.Api.Contracts.Auth;
 global using Template.Api.Contracts.Users;
 global using Template.Api.Entities;
+global using Template.Api.Enums;
 global using Template.Api.Errors;
 global using Template.Api.Extensions;
 global using Template.Api.Helpers;
@@ -23,3 +24,4 @@ global using Template.Api.Jobs;
 global using Template.Api.Persistence;
 global using Template.Api.Services;
 global using Template.Api.Settings;
+

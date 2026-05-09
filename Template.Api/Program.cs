@@ -20,38 +20,12 @@ if (app.Environment.IsDevelopment())
 }
 
 
-// Recurring Jobs
-using (var scope = app.Services.CreateScope())
-{
-	var recurringJobManager = scope.ServiceProvider
-		.GetRequiredService<IRecurringJobManager>();
-
-	// every day at 12 AM
-	recurringJobManager.AddOrUpdate<CleanUpExpiredRefreshTokensJob>(
-		"cleanup-expired-refresh-tokens",
-		job => job.ExecuteAsync(),
-		Cron.Daily()
-	);
-
-	// every Hour
-	recurringJobManager.AddOrUpdate<CleanUpExpiredPasswordResetCodesJob>(
-		 "cleanup-expired-reset-codes",
-		job => job.ExecuteAsync(),
-		Cron.Hourly()
-	);
-}
-
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
-app.UseCors();
-
-app.UseRateLimiter();
-
-app.UseAuthentication();
-
-app.UseAuthorization();
+// Recurring Jobs
+app.UseRecurringJobs();
 
 // https://localhost:7131/jobs
 app.UseHangfireDashboard("/jobs", new DashboardOptions
@@ -67,6 +41,14 @@ app.UseHangfireDashboard("/jobs", new DashboardOptions
 	DashboardTitle = "Auth Template Service - Job Dashboard",
 	IsReadOnlyFunc = (context) => true
 });
+
+app.UseCors();
+
+app.UseRateLimiter();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

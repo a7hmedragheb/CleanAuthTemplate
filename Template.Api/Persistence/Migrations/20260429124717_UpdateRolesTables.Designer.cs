@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Template.Api.Persistence;
 
@@ -11,9 +12,11 @@ using Template.Api.Persistence;
 namespace Template.Api.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260429124717_UpdateRolesTables")]
+    partial class UpdateRolesTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,13 +110,6 @@ namespace Template.Api.Persistence.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "019dd94b-9c35-78a3-b7e1-905263792220",
-                            RoleId = "019dd94b-9c35-78a3-b7e1-90544b8be79e"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -166,26 +162,6 @@ namespace Template.Api.Persistence.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "019dd94b-9c35-78a3-b7e1-90544b8be79e",
-                            ConcurrencyStamp = "019dd94b-9c35-78a3-b7e1-90552fb9ab80",
-                            IsDefault = false,
-                            IsDeleted = false,
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "019dd94b-9c35-78a3-b7e1-90560e296a0b",
-                            ConcurrencyStamp = "019dd94b-9c35-78a3-b7e1-90575fd7c247",
-                            IsDefault = true,
-                            IsDeleted = false,
-                            Name = "Member",
-                            NormalizedName = "MEMBER"
-                        });
                 });
 
             modelBuilder.Entity("Template.Api.Entities.ApplicationUser", b =>
@@ -199,6 +175,9 @@ namespace Template.Api.Persistence.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
@@ -273,6 +252,9 @@ namespace Template.Api.Persistence.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -288,28 +270,6 @@ namespace Template.Api.Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "019dd94b-9c35-78a3-b7e1-905263792220",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "019dd94b-9c35-78a3-b7e1-9053bc21473b",
-                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "admin@template.com",
-                            EmailConfirmed = true,
-                            FirstName = "Template",
-                            IsDeleted = false,
-                            LastName = "Admin",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@TEMPLATE.COM",
-                            NormalizedUserName = "ADMIN@TEMPLATE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEb4m4HWcwdNhyuLoVUfe255hAp2E8U9fa2QzfIHzOUYTI4khgryMuyWVsHcOslRVA==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "045A9DEA16F5473DA2C73C6D788FEACE",
-                            TwoFactorEnabled = false,
-                            UserName = "admin@template.com"
-                        });
                 });
 
             modelBuilder.Entity("Template.Api.Entities.PasswordResetCode", b =>

@@ -1,4 +1,5 @@
-﻿namespace Template.Api.Mapping;
+﻿
+namespace Template.Api.Mapping;
 
 public class MappingConfigurations : IRegister
 {

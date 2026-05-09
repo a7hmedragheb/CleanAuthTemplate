@@ -37,6 +37,7 @@ public static class DependencyInjection
 		services.AddScoped<IEmailSender, EmailService>();
 		services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 		services.AddScoped<IImageService, ImageService>();
+		services.AddScoped<IRoleService, RoleService>();
 
 		services
 			.AddMapsterConfig()
@@ -82,7 +83,7 @@ public static class DependencyInjection
 
 	private static IServiceCollection AddAuthConfig(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.AddIdentity<ApplicationUser, IdentityRole>()
+		services.AddIdentity<ApplicationUser, ApplicationRole>()
 			.AddEntityFrameworkStores<ApplicationDbContext>()
 			.AddDefaultTokenProviders();
 

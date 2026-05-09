@@ -47,7 +47,6 @@ public class UserService : IUserService
 					   .SetProperty(x => x.PhoneNumber, request.PhoneNumber)
 					   .SetProperty(x => x.DateOfBirth, request.DateOfBirth.ToDateTime(TimeOnly.MinValue))
 					   .SetProperty(x => x.Gender, request.Gender)
-					   .SetProperty(x => x.UpdatedOn, DateTime.UtcNow)
 			);
 
 		return Result.Success();
