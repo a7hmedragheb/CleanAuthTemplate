@@ -1,23 +1,175 @@
-﻿namespace Template.Api.Services;
+﻿using Azure;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace Template.Api.Services;
 public class UserService : IUserService
 {
 	private readonly UserManager<ApplicationUser> _userManager;
+	private readonly ApplicationDbContext _context;
 	private readonly IImageService _imageService;
 	private readonly ILogger<UserService> _logger;
 	private readonly IEmailSender _emailSender;
 	private readonly AppSettings _appSettings;
+	private readonly IRoleService _roleService;
 
 	public UserService(UserManager<ApplicationUser> userManager,
+		ApplicationDbContext context,
 		IImageService imageService,
 		ILogger<UserService> logger,
 		IEmailSender emailSender,
-		IOptions<AppSettings> appSettings)
+		IOptions<AppSettings> appSettings,
+		IRoleService roleService)
 	{
 		_userManager = userManager;
+		_context = context;
 		_imageService = imageService;
 		_logger = logger;
 		_emailSender = emailSender;
 		_appSettings = appSettings.Value;
+		_roleService = roleService;
+	}
+
+	public async Task<IEnumerable<UserResponse>> GetAllAsync(CancellationToken cancellationToken = default) =>
+				await (from u in _context.Users
+					   join ur in _context.UserRoles
+					   on u.Id equals ur.UserId
+					   join r in _context.Roles
+					   on ur.RoleId equals r.Id into roles
+					   where !roles.Any(x => x.Name == DefaultRoles.Member.Name)
+					   select new
+					   {
+						   u.Id,
+						   u.Email,
+						   u.FirstName,
+						   u.LastName,
+						   u.IsDisabled,
+						   Roles = roles.Select(x => x.Name).ToList()
+					   }
+					   )
+					   .GroupBy(u => new { u.Id, u.Email, u.FirstName, u.LastName, u.IsDisabled })
+					   .Select(u => new UserResponse
+					   (
+						   u.Key.Id,
+						   u.Key.Email,
+						   u.Key.FirstName,
+						   u.Key.LastName,
+						   u.Key.IsDisabled,
+						   u.SelectMany(x => x.Roles)
+					   ))
+					   .ToListAsync(cancellationToken);
+
+	public async Task<Result<UserResponse>> GetAsync(string userId)
+	{
+		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
+			return Result.Failure<UserResponse>(UserErrors.UserNotFound);
+
+		var userRoles = await _userManager.GetRolesAsync(user);
+
+		var response = (user, userRoles).Adapt<UserResponse>();
+
+		return Result.Success(response);
+	}
+
+	public async Task<Result<UserResponse>> AddAsync(CreateUserRequest request, CancellationToken cancellationToken = default)
+	{
+		var emailExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
+
+		if (emailExists)
+			return Result.Failure<UserResponse>(UserErrors.DuplicatedEmail);
+
+		var allowedRoles = await _roleService.GetAllAsync(cancellationToken: cancellationToken);
+
+		if (request.Roles.Except(allowedRoles.Select(x => x.Name)).Any())
+			return Result.Failure<UserResponse>(UserErrors.InvalidRoles);
+
+		var user = request.Adapt<ApplicationUser>();
+
+		user.EmailConfirmed = true;
+
+		var result = await _userManager.CreateAsync(user, request.Password);
+
+		if (result.Succeeded)
+		{
+			await _userManager.AddToRolesAsync(user, request.Roles);
+
+			var response = (user, request.Roles).Adapt<UserResponse>();
+
+			return Result.Success(response);
+		}
+
+		var error = result.Errors.First();
+
+		return Result.Failure<UserResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+	}
+
+	public async Task<Result> UpdateAsync(string id, UpdateUserRequest request, CancellationToken cancellationToken = default)
+	{
+		if (await _userManager.FindByIdAsync(id) is not { } user)
+			return Result.Failure(UserErrors.UserNotFound);
+
+		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email && x.Id != id, cancellationToken);
+
+		if (emailIsExists)
+			return Result.Failure(UserErrors.DuplicatedEmail);
+
+		var allowedRoles = await _roleService.GetAllAsync(cancellationToken: cancellationToken);
+
+		if (request.Roles.Except(allowedRoles.Select(x => x.Name)).Any())
+			return Result.Failure(UserErrors.InvalidRoles);
+
+		if (user.Email != request.Email)
+			user.EmailConfirmed = false;
+
+		user = request.Adapt(user);
+
+		var result = await _userManager.UpdateAsync(user);
+
+		if (result.Succeeded)
+		{
+			await _context.UserRoles
+				.Where(x => x.UserId == id)
+				.ExecuteDeleteAsync(cancellationToken);
+
+			await _userManager.AddToRolesAsync(user, request.Roles);
+
+			return Result.Success();
+		}
+
+		var error = result.Errors.First();
+
+		return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+	}
+
+	public async Task<Result> ToggleStatusAsync(string id)
+	{
+		if (await _userManager.FindByIdAsync(id) is not { } user)
+			return Result.Failure(UserErrors.UserNotFound);
+
+		user.IsDisabled = !user.IsDisabled;
+
+		var result = await _userManager.UpdateAsync(user);
+
+		if (result.Succeeded)
+			return Result.Success();
+
+		var error = result.Errors.First();
+
+		return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+	}
+
+	public async Task<Result> Unlock(string id)
+	{
+		if (await _userManager.FindByIdAsync(id) is not { } user)
+			return Result.Failure(UserErrors.UserNotFound);
+
+		var result = await _userManager.SetLockoutEndDateAsync(user, null);
+
+		if (result.Succeeded)
+			return Result.Success();
+
+		var error = result.Errors.First();
+
+		return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 	}
 
 	public async Task<Result<UserProfileResponse>> GetProfileAsync(string userId)
@@ -98,17 +250,18 @@ public class UserService : IUserService
 		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
 
-		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == newEmail);
+		var emailExists = await _userManager.Users.AnyAsync(x => x.Email == newEmail);
 
-		if (emailIsExists)
+		if (emailExists)
 			return Result.Failure(UserErrors.DuplicatedEmail);
 
-		user.PendingEmail = newEmail;
-		await _userManager.UpdateAsync(user);
+		var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
 
-		await SendChangeEmailAsync(user, newEmail);
+		var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-		_logger.LogInformation("Email change link sent to {NewEmail} for user {UserId}", newEmail, userId);
+		await SendChangeEmailAsync(user, newEmail, encodedToken);
+
+		//_logger.LogInformation("Email change link sent to {NewEmail} for user {UserId}", newEmail, userId);
 
 		return Result.Success();
 	}
@@ -117,9 +270,6 @@ public class UserService : IUserService
 	{
 		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
-
-		if (user.PendingEmail != request.NewEmail)
-			return Result.Failure(UserErrors.InvalidCode);
 
 		string decodedToken;
 
@@ -142,17 +292,14 @@ public class UserService : IUserService
 
 		await _userManager.SetUserNameAsync(user, request.NewEmail);
 
-		user.PendingEmail = null;
-		await _userManager.UpdateAsync(user);
-
-		_logger.LogInformation("Email changed successfully for user {UserId}", userId);
+		//_logger.LogInformation("Email changed successfully for user {UserId}", userId);
 
 		return Result.Success();
 	}
 
 	public async Task<Result> DeleteAccountAsync(string userId, string password)
 	{
-		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
+		if (await _userManager.Users.Include(u => u.RefreshTokens).SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
 
 		var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
@@ -161,8 +308,7 @@ public class UserService : IUserService
 			return Result.Failure(UserErrors.InvalidPassword);
 
 		//  Logical Delete
-		user.IsDeleted = true;
-		user.DeletedAt = DateTime.UtcNow;
+		user.IsDisabled = true;
 
 		//  Revoke Tokens
 		foreach (var token in user.RefreshTokens.Where(t => t.IsActive))
@@ -170,19 +316,18 @@ public class UserService : IUserService
 
 		await _userManager.UpdateAsync(user);
 
-		_logger.LogInformation("Account soft deleted for user {UserId}", userId);
-
 		return Result.Success();
 	}
 
-	private async Task SendChangeEmailAsync(ApplicationUser user, string newEmail)
+	private async Task SendChangeEmailAsync(ApplicationUser user, string newEmail, string encodedToken)
 	{
-		var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
-		var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+		var changeEmailLink =
+		$"{_appSettings.FrontendBaseUrl}/confirm-email-change" +
+			$"?userId={user.Id}" +
+			$"&email={Uri.EscapeDataString(newEmail)}" +
+			$"&token={encodedToken}";
 
-		var changeEmailLink = $"{_appSettings.FrontendBaseUrl}/confirm-email-change?userId={user.Id}&email={Uri.EscapeDataString(newEmail)}&token={encodedToken}";
-
-		_logger.LogInformation("Email change link for {UserId}: {Link}", user.Id, changeEmailLink);
+		//_logger.LogInformation("Email change link for {UserId}: {Link}", user.Id, changeEmailLink);
 
 		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.ChangeEmail,
 			new Dictionary<string, string>

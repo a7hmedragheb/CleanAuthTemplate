@@ -9,6 +9,12 @@
 	public static readonly Error InvalidRefreshToken =
 		new("User.InvalidRefreshToken", "Invalid refresh token.", StatusCodes.Status401Unauthorized);
 
+	public static readonly Error DisabledUser =
+	  new("User.DisabledUser", "Disabled user, please contact your admininstrator", StatusCodes.Status401Unauthorized);
+
+	public static readonly Error LockedUser =
+		  new("User.LockedUser", "Locked user, please contact your admininstrator", StatusCodes.Status401Unauthorized);
+
 	public static readonly Error DuplicatedEmail =
 		new("User.DuplicatedEmail", "A user with the same email already exists.", StatusCodes.Status409Conflict);
 
@@ -20,6 +26,10 @@
 
 	public static readonly Error ExpiredCode =
 		new("Code.ExpiredCode", "No valid code found or it has expired.", StatusCodes.Status400BadRequest);
+
+	public static readonly Error InvalidRoles =
+	  new("User.InvalidRoles", "Invalid roles", StatusCodes.Status400BadRequest);
+
 
 	public static readonly Error UserNotFound =
 		new("User.UserNotFound", "User not found.", StatusCodes.Status404NotFound);
