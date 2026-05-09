@@ -5,6 +5,7 @@ public class AuthService : IAuthService
 {
 	private readonly ApplicationDbContext _context;
 	private readonly UserManager<ApplicationUser> _userManager;
+	private readonly SignInManager<ApplicationUser> _signInManager;
 	private readonly IJwtProvider _jwtProvider;
 	private readonly ILogger<AuthService> _logger;
 	private readonly IEmailSender _emailSender;
@@ -15,6 +16,7 @@ public class AuthService : IAuthService
 	private readonly int _refreshTokenExpiryDays = 14;
 	public AuthService(ApplicationDbContext context,
 			UserManager<ApplicationUser> userManager,
+			SignInManager<ApplicationUser> signInManager,
 			IJwtProvider jwtProvider,
 			ILogger<AuthService> logger,
 			IEmailSender emailSender,
@@ -23,6 +25,7 @@ public class AuthService : IAuthService
 	{
 		_context = context;
 		_userManager = userManager;
+		_signInManager = signInManager;
 		_jwtProvider = jwtProvider;
 		_logger = logger;
 		_emailSender = emailSender;
@@ -43,44 +46,56 @@ public class AuthService : IAuthService
 		if (user.IsDisabled)
 			return Result.Failure<AuthResult>(UserErrors.DisabledUser);
 
-		var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
+		//var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
 
-		if (!isPasswordValid)
-			return Result.Failure<AuthResult>(UserErrors.InvalidCredentials);
+		//if (!isPasswordValid)
+		//	return Result.Failure<AuthResult>(UserErrors.InvalidCredentials);
 
-		var userRoles = await _userManager.GetRolesAsync(user);
+		var result = await _signInManager.PasswordSignInAsync(user, password, false, true);
 
-		var (token, expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
-
-		var refreshToken = GenerateRefreshToken();
-		var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
-
-
-		user.RefreshTokens.Add(new RefreshToken
+		if (result.Succeeded)
 		{
-			Token = refreshToken,
-			ExpiresOn = refreshTokenExpiration
-		});
+			var userRoles = await _userManager.GetRolesAsync(user);
 
-		await _userManager.UpdateAsync(user);
+			var (token, expiresIn) = _jwtProvider.GenerateToken(user, userRoles);
+			var refreshToken = GenerateRefreshToken();
+			var refreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 
-		var response = new AuthResult(
-			new AuthResponse(
-				user.Id,
-				user.Email,
-				user.FirstName,
-				user.LastName,
-				user.PhoneNumber,
-				DateOnly.FromDateTime(user.DateOfBirth),
-				user.Gender.ToString()!,
-				token,
-				expiresIn
-			),
-			refreshToken,
-			refreshTokenExpiration
-		);
 
-		return Result.Success(response);
+			user.RefreshTokens.Add(new RefreshToken
+			{
+				Token = refreshToken,
+				ExpiresOn = refreshTokenExpiration
+			});
+
+			await _userManager.UpdateAsync(user);
+
+			var response = new AuthResult(
+				new AuthResponse(
+					user.Id,
+					user.Email,
+					user.FirstName,
+					user.LastName,
+					user.PhoneNumber,
+					DateOnly.FromDateTime(user.DateOfBirth),
+					user.Gender.ToString()!,
+					token,
+					expiresIn
+				),
+				refreshToken,
+				refreshTokenExpiration
+			);
+
+			return Result.Success(response);
+		}
+
+		var error = result.IsNotAllowed
+			? UserErrors.EmailNotConfirmed
+			: result.IsLockedOut
+			? UserErrors.LockedUser
+			: UserErrors.InvalidCredentials;
+
+		return Result.Failure<AuthResult>(error);
 	}
 
 	public async Task<Result<AuthResult>> GetRefreshTokenAsync(string token, string refreshToken, CancellationToken cancellationToken = default)
@@ -97,6 +112,9 @@ public class AuthService : IAuthService
 
 		if (user.IsDisabled)
 			return Result.Failure<AuthResult>(UserErrors.DisabledUser);
+
+		if (user.LockoutEnd > DateTime.UtcNow)
+			return Result.Failure<AuthResult>(UserErrors.LockedUser);
 
 		var userRefreshToken = user.RefreshTokens.SingleOrDefault(t => t.Token == refreshToken && t.IsActive);
 
@@ -222,8 +240,8 @@ public class AuthService : IAuthService
 			return Result.Success();
 		}
 
-		var error = result.Errors.First(); 
-		
+		var error = result.Errors.First();
+
 		return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 	}
 
