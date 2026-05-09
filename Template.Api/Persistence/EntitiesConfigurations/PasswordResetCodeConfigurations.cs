@@ -31,6 +31,6 @@ public class PasswordResetCodeConfigurations : IEntityTypeConfiguration<Password
 			.IsRequired()
 			.HasDefaultValue(0);
 
-		builder.HasQueryFilter(x => !x.User.IsDisabled);
+		//builder.HasQueryFilter(x => !x.User.IsDisabled);
 	}
 }

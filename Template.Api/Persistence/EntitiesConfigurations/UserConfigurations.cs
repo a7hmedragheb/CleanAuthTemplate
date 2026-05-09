@@ -24,7 +24,7 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 			.HasForeignKey("UserId");
 
 		// Global Filter for disappear Deleted Users Query Results
-		builder.HasQueryFilter(u => !u.IsDisabled);
+		//builder.HasQueryFilter(u => !u.IsDisabled);
 
 
 		//Define Data

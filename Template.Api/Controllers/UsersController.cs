@@ -47,7 +47,6 @@ public class UsersController : ControllerBase
 		return result.IsSuccess ? NoContent() : result.ToProblem();
 	}
 
-
 	[HttpPut("{id}/toggle-status")]
 	public async Task<IActionResult> ToggleStatus([FromRoute] string id)
 	{
@@ -56,4 +55,11 @@ public class UsersController : ControllerBase
 		return result.IsSuccess ? NoContent() : result.ToProblem();
 	}
 
+	[HttpPut("{id}/unlock")]
+	public async Task<IActionResult> Unlock([FromRoute] string id)
+	{
+		var result = await _userService.Unlock(id);
+
+		return result.IsSuccess ? NoContent() : result.ToProblem();
+	}
 }

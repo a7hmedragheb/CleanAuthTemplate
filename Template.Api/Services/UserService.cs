@@ -142,12 +142,27 @@ public class UserService : IUserService
 
 	public async Task<Result> ToggleStatusAsync(string id)
 	{
-		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == id) is not { } user)
+		if (await _userManager.FindByIdAsync(id) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
 
 		user.IsDisabled = !user.IsDisabled;
 
 		var result = await _userManager.UpdateAsync(user);
+
+		if (result.Succeeded)
+			return Result.Success();
+
+		var error = result.Errors.First();
+
+		return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+	}
+
+	public async Task<Result> Unlock(string id)
+	{
+		if (await _userManager.FindByIdAsync(id) is not { } user)
+			return Result.Failure(UserErrors.UserNotFound);
+
+		var result = await _userManager.SetLockoutEndDateAsync(user, null);
 
 		if (result.Succeeded)
 			return Result.Success();
