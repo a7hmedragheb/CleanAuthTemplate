@@ -36,4 +36,12 @@ public class RolesController : ControllerBase
 
 		return result.IsSuccess ? CreatedAtAction(nameof(Get), new { result.Value.Id }, result.Value) : result.ToProblem();
 	}
+
+	[HttpPut("{id}")]
+	public async Task<IActionResult> Update([FromRoute] string id, [FromBody] RoleRequest request)
+	{
+		var result = await _roleService.UpdateAsync(id, request);
+
+		return result.IsSuccess ? NoContent() : result.ToProblem();
+	}
 }

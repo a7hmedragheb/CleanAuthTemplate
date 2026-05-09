@@ -52,4 +52,26 @@ public class RoleService : IRoleService
 
 		return Result.Failure<RoleResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 	}
+
+	public async Task<Result> UpdateAsync(string id, RoleRequest request)
+	{
+		if (await _roleManager.FindByIdAsync(id) is not { } role)
+			return Result.Failure(RoleErrors.RoleNotFound);
+
+		var roleIsExists = await _roleManager.Roles.AnyAsync(x => x.Name == request.Name && x.Id != id);
+
+		if (roleIsExists)
+			return Result.Failure(RoleErrors.DuplicatedRole);
+
+		role.Name = request.Name;
+
+		var result = await _roleManager.UpdateAsync(role);
+
+		if (result.Succeeded)
+			return Result.Success();
+
+		var error = result.Errors.First();
+
+		return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+	}
 }
