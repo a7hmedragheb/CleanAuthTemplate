@@ -40,6 +40,9 @@ public class AuthService : IAuthService
 		if (!user.EmailConfirmed)
 			return Result.Failure<AuthResult>(UserErrors.EmailNotConfirmed);
 
+		if (user.IsDisabled)
+			return Result.Failure<AuthResult>(UserErrors.DisabledUser);
+
 		var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
 
 		if (!isPasswordValid)
@@ -91,6 +94,9 @@ public class AuthService : IAuthService
 
 		if (user is null)
 			return Result.Failure<AuthResult>(UserErrors.InvalidJwtToken);
+
+		if (user.IsDisabled)
+			return Result.Failure<AuthResult>(UserErrors.DisabledUser);
 
 		var userRefreshToken = user.RefreshTokens.SingleOrDefault(t => t.Token == refreshToken && t.IsActive);
 
