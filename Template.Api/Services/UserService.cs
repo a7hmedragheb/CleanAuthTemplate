@@ -2,23 +2,57 @@
 public class UserService : IUserService
 {
 	private readonly UserManager<ApplicationUser> _userManager;
+	private readonly ApplicationDbContext _context;
 	private readonly IImageService _imageService;
 	private readonly ILogger<UserService> _logger;
 	private readonly IEmailSender _emailSender;
 	private readonly AppSettings _appSettings;
 
 	public UserService(UserManager<ApplicationUser> userManager,
+		ApplicationDbContext context,
 		IImageService imageService,
 		ILogger<UserService> logger,
 		IEmailSender emailSender,
 		IOptions<AppSettings> appSettings)
 	{
 		_userManager = userManager;
+		_context = context;
 		_imageService = imageService;
 		_logger = logger;
 		_emailSender = emailSender;
 		_appSettings = appSettings.Value;
 	}
+
+	public async Task<IEnumerable<UserResponse>> GetAllAsync(CancellationToken cancellationToken = default) =>
+				await (from u in _context.Users
+					   join ur in _context.UserRoles
+					   on u.Id equals ur.RoleId
+					   join r in _context.Roles
+					   on ur.RoleId equals r.Id into roles
+					   where roles.Any(x => x.Name != DefaultRoles.Member.Name)
+					   select new
+					   {
+						   u.Id,
+						   u.Email,
+						   u.FirstName,
+						   u.LastName,
+						   u.IsDisabled,
+						   Roles = roles.Select(x => x.Name).ToList()
+					   }
+					   )
+					   .GroupBy(u => new { u.Id, u.Email, u.FirstName, u.LastName, u.IsDisabled })
+					   .Select(u => new UserResponse
+					   (
+						   u.Key.Id,
+						   u.Key.Email,
+						   u.Key.FirstName,
+						   u.Key.LastName,
+						   u.Key.IsDisabled,
+						   u.SelectMany(x => x.Roles)
+					   ))
+					   .ToListAsync(cancellationToken);
+
+
 
 	public async Task<Result<UserProfileResponse>> GetProfileAsync(string userId)
 	{
