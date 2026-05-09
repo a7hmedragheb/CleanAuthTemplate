@@ -250,17 +250,18 @@ public class UserService : IUserService
 		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
 
-		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == newEmail);
+		var emailExists = await _userManager.Users.AnyAsync(x => x.Email == newEmail);
 
-		if (emailIsExists)
+		if (emailExists)
 			return Result.Failure(UserErrors.DuplicatedEmail);
 
-		//user.PendingEmail = newEmail;
-		await _userManager.UpdateAsync(user);
+		var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
 
-		await SendChangeEmailAsync(user, newEmail);
+		var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-		_logger.LogInformation("Email change link sent to {NewEmail} for user {UserId}", newEmail, userId);
+		await SendChangeEmailAsync(user, newEmail, encodedToken);
+
+		//_logger.LogInformation("Email change link sent to {NewEmail} for user {UserId}", newEmail, userId);
 
 		return Result.Success();
 	}
@@ -269,9 +270,6 @@ public class UserService : IUserService
 	{
 		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
-
-		//if (user.PendingEmail != request.NewEmail)
-		//	return Result.Failure(UserErrors.InvalidCode);
 
 		string decodedToken;
 
@@ -294,10 +292,7 @@ public class UserService : IUserService
 
 		await _userManager.SetUserNameAsync(user, request.NewEmail);
 
-		//user.PendingEmail = null;
-		await _userManager.UpdateAsync(user);
-
-		_logger.LogInformation("Email changed successfully for user {UserId}", userId);
+		//_logger.LogInformation("Email changed successfully for user {UserId}", userId);
 
 		return Result.Success();
 	}
@@ -324,14 +319,15 @@ public class UserService : IUserService
 		return Result.Success();
 	}
 
-	private async Task SendChangeEmailAsync(ApplicationUser user, string newEmail)
+	private async Task SendChangeEmailAsync(ApplicationUser user, string newEmail, string encodedToken)
 	{
-		var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
-		var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+		var changeEmailLink =
+		$"{_appSettings.FrontendBaseUrl}/confirm-email-change" +
+			$"?userId={user.Id}" +
+			$"&email={Uri.EscapeDataString(newEmail)}" +
+			$"&token={encodedToken}";
 
-		var changeEmailLink = $"{_appSettings.FrontendBaseUrl}/confirm-email-change?userId={user.Id}&email={Uri.EscapeDataString(newEmail)}&token={encodedToken}";
-
-		_logger.LogInformation("Email change link for {UserId}: {Link}", user.Id, changeEmailLink);
+		//_logger.LogInformation("Email change link for {UserId}: {Link}", user.Id, changeEmailLink);
 
 		var emailBody = await EmailBodyBuilder.GenerateEmailBody(TemplateConsts.ChangeEmail,
 			new Dictionary<string, string>
