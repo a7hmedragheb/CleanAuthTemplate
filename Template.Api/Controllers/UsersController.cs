@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using System.Threading;
 
 namespace Template.Api.Controllers;
 
@@ -44,6 +45,15 @@ public class UsersController : ControllerBase
 		var result = await _userService.UpdateAsync(id, request, cancellationToken);
 
 		return result.IsSuccess ? NoContent() : result.ToProblem();
-
 	}
+
+
+	[HttpPut("{id}/toggle-status")]
+	public async Task<IActionResult> ToggleStatus([FromRoute] string id)
+	{
+		var result = await _userService.ToggleStatusAsync(id);
+
+		return result.IsSuccess ? NoContent() : result.ToProblem();
+	}
+
 }

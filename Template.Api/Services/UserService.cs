@@ -1,4 +1,5 @@
 ﻿using Azure;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Template.Api.Services;
 public class UserService : IUserService
@@ -71,8 +72,9 @@ public class UserService : IUserService
 
 	public async Task<Result<UserResponse>> AddAsync(CreateUserRequest request, CancellationToken cancellationToken = default)
 	{
-		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
-		if (emailIsExists)
+		var emailExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
+
+		if (emailExists)
 			return Result.Failure<UserResponse>(UserErrors.DuplicatedEmail);
 
 		var allowedRoles = await _roleService.GetAllAsync(cancellationToken: cancellationToken);
@@ -105,15 +107,15 @@ public class UserService : IUserService
 		if (await _userManager.FindByIdAsync(id) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
 
-		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
+		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email && x.Id != id, cancellationToken);
 
 		if (emailIsExists)
-			return Result.Failure<UserResponse>(UserErrors.DuplicatedEmail);
+			return Result.Failure(UserErrors.DuplicatedEmail);
 
 		var allowedRoles = await _roleService.GetAllAsync(cancellationToken: cancellationToken);
 
 		if (request.Roles.Except(allowedRoles.Select(x => x.Name)).Any())
-			return Result.Failure<UserResponse>(UserErrors.InvalidRoles);
+			return Result.Failure(UserErrors.InvalidRoles);
 
 		if (user.Email != request.Email)
 			user.EmailConfirmed = false;
@@ -137,6 +139,24 @@ public class UserService : IUserService
 
 		return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 	}
+
+	public async Task<Result> ToggleStatusAsync(string id)
+	{
+		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == id) is not { } user)
+			return Result.Failure(UserErrors.UserNotFound);
+
+		user.IsDisabled = !user.IsDisabled;
+
+		var result = await _userManager.UpdateAsync(user);
+
+		if (result.Succeeded)
+			return Result.Success();
+
+		var error = result.Errors.First();
+
+		return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
+	}
+
 	public async Task<Result<UserProfileResponse>> GetProfileAsync(string userId)
 	{
 		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
