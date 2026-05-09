@@ -9,13 +9,15 @@ public class UserService : IUserService
 	private readonly ILogger<UserService> _logger;
 	private readonly IEmailSender _emailSender;
 	private readonly AppSettings _appSettings;
+	private readonly IRoleService _roleService;
 
 	public UserService(UserManager<ApplicationUser> userManager,
 		ApplicationDbContext context,
 		IImageService imageService,
 		ILogger<UserService> logger,
 		IEmailSender emailSender,
-		IOptions<AppSettings> appSettings)
+		IOptions<AppSettings> appSettings,
+		IRoleService roleService)
 	{
 		_userManager = userManager;
 		_context = context;
@@ -23,15 +25,16 @@ public class UserService : IUserService
 		_logger = logger;
 		_emailSender = emailSender;
 		_appSettings = appSettings.Value;
+		_roleService = roleService;
 	}
 
 	public async Task<IEnumerable<UserResponse>> GetAllAsync(CancellationToken cancellationToken = default) =>
 				await (from u in _context.Users
 					   join ur in _context.UserRoles
-					   on u.Id equals ur.RoleId
+					   on u.Id equals ur.UserId
 					   join r in _context.Roles
 					   on ur.RoleId equals r.Id into roles
-					   where roles.Any(x => x.Name != DefaultRoles.Member.Name)
+					   where !roles.Any(x => x.Name == DefaultRoles.Member.Name)
 					   select new
 					   {
 						   u.Id,
@@ -64,6 +67,36 @@ public class UserService : IUserService
 		var response = (user, userRoles).Adapt<UserResponse>();
 
 		return Result.Success(response);
+	}
+	public async Task<Result<UserResponse>> AddAsync(CreateUserRequest request, CancellationToken cancellationToken = default)
+	{
+		var emailIsExists = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
+		if (emailIsExists)
+			return Result.Failure<UserResponse>(UserErrors.DuplicatedEmail);
+
+		var allowedRoles = await _roleService.GetAllAsync(cancellationToken: cancellationToken);
+
+		if (request.Roles.Except(allowedRoles.Select(x => x.Name)).Any())
+			return Result.Failure<UserResponse>(UserErrors.InvalidRoles);
+
+		var user = request.Adapt<ApplicationUser>();
+
+		user.EmailConfirmed = true;
+
+		var result = await _userManager.CreateAsync(user, request.Password);
+
+		if (result.Succeeded)
+		{
+			await _userManager.AddToRolesAsync(user, request.Roles);
+
+			var response = (user, request.Roles).Adapt<UserResponse>();
+
+			return Result.Success(response);
+		}
+
+		var error = result.Errors.First();
+
+		return Result.Failure<UserResponse>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 	}
 
 	public async Task<Result<UserProfileResponse>> GetProfileAsync(string userId)

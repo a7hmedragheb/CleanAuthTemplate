@@ -18,7 +18,7 @@ public class UsersController : ControllerBase
 	public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
 	{
 		var users = await _userService.GetAllAsync(cancellationToken);
-	
+
 		return Ok(users);
 	}
 
@@ -28,5 +28,13 @@ public class UsersController : ControllerBase
 		var result = await _userService.GetAsync(id);
 
 		return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+	}
+
+	[HttpPost("")]
+	public async Task<IActionResult> Add([FromBody] CreateUserRequest request, CancellationToken cancellationToken)
+	{
+		var result = await _userService.AddAsync(request, cancellationToken);
+
+		return result.IsSuccess ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value) : result.ToProblem();
 	}
 }

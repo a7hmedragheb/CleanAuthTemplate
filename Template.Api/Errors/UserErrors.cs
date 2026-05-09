@@ -21,6 +21,10 @@
 	public static readonly Error ExpiredCode =
 		new("Code.ExpiredCode", "No valid code found or it has expired.", StatusCodes.Status400BadRequest);
 
+	public static readonly Error InvalidRoles =
+	  new("User.InvalidRoles", "Invalid roles", StatusCodes.Status400BadRequest);
+
+
 	public static readonly Error UserNotFound =
 		new("User.UserNotFound", "User not found.", StatusCodes.Status404NotFound);
 
