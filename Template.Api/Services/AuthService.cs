@@ -245,7 +245,7 @@ public class AuthService : IAuthService
 		.IgnoreQueryFilters()
 		.SingleOrDefaultAsync(u => u.Email == payload.Email, cancellationToken);
 
-		if (user is not null && user.IsDeleted)
+		if (user is not null && user.IsDisabled)
 			return Result.Failure<AuthResult>(UserErrors.UserNotFound);
 
 		if (user is null)

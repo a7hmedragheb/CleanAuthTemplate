@@ -23,15 +23,8 @@ public class UserConfigurations : IEntityTypeConfiguration<ApplicationUser>
 			.WithOwner()
 			.HasForeignKey("UserId");
 
-		builder.Property(u => u.PendingEmail)
-			.HasMaxLength(256);
-
-		builder.Property(u => u.IsDeleted)
-			.IsRequired()
-			.HasDefaultValue(false);
-
 		// Global Filter for disappear Deleted Users Query Results
-		builder.HasQueryFilter(u => !u.IsDeleted);
+		builder.HasQueryFilter(u => !u.IsDisabled);
 
 
 		//Define Data

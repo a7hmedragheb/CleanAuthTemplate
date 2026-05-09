@@ -103,7 +103,7 @@ public class UserService : IUserService
 		if (emailIsExists)
 			return Result.Failure(UserErrors.DuplicatedEmail);
 
-		user.PendingEmail = newEmail;
+		//user.PendingEmail = newEmail;
 		await _userManager.UpdateAsync(user);
 
 		await SendChangeEmailAsync(user, newEmail);
@@ -118,8 +118,8 @@ public class UserService : IUserService
 		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
 
-		if (user.PendingEmail != request.NewEmail)
-			return Result.Failure(UserErrors.InvalidCode);
+		//if (user.PendingEmail != request.NewEmail)
+		//	return Result.Failure(UserErrors.InvalidCode);
 
 		string decodedToken;
 
@@ -142,7 +142,7 @@ public class UserService : IUserService
 
 		await _userManager.SetUserNameAsync(user, request.NewEmail);
 
-		user.PendingEmail = null;
+		//user.PendingEmail = null;
 		await _userManager.UpdateAsync(user);
 
 		_logger.LogInformation("Email changed successfully for user {UserId}", userId);
@@ -152,7 +152,7 @@ public class UserService : IUserService
 
 	public async Task<Result> DeleteAccountAsync(string userId, string password)
 	{
-		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
+		if (await _userManager.Users.Include(u => u.RefreshTokens).SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
 			return Result.Failure(UserErrors.UserNotFound);
 
 		var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
@@ -161,16 +161,13 @@ public class UserService : IUserService
 			return Result.Failure(UserErrors.InvalidPassword);
 
 		//  Logical Delete
-		user.IsDeleted = true;
-		user.DeletedAt = DateTime.UtcNow;
+		user.IsDisabled = true;
 
 		//  Revoke Tokens
 		foreach (var token in user.RefreshTokens.Where(t => t.IsActive))
 			token.RevokedOn = DateTime.UtcNow;
 
 		await _userManager.UpdateAsync(user);
-
-		_logger.LogInformation("Account soft deleted for user {UserId}", userId);
 
 		return Result.Success();
 	}
