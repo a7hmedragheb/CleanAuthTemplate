@@ -21,4 +21,12 @@ public class UsersController : ControllerBase
 	
 		return Ok(users);
 	}
+
+	[HttpGet("{id}")]
+	public async Task<IActionResult> Get([FromRoute] string id)
+	{
+		var result = await _userService.GetAsync(id);
+
+		return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+	}
 }

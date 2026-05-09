@@ -1,4 +1,6 @@
-﻿namespace Template.Api.Services;
+﻿using Azure;
+
+namespace Template.Api.Services;
 public class UserService : IUserService
 {
 	private readonly UserManager<ApplicationUser> _userManager;
@@ -52,7 +54,17 @@ public class UserService : IUserService
 					   ))
 					   .ToListAsync(cancellationToken);
 
+	public async Task<Result<UserResponse>> GetAsync(string userId)
+	{
+		if (await _userManager.Users.SingleOrDefaultAsync(x => x.Id == userId) is not { } user)
+			return Result.Failure<UserResponse>(UserErrors.UserNotFound);
 
+		var userRoles = await _userManager.GetRolesAsync(user);
+
+		var response = (user, userRoles).Adapt<UserResponse>();
+
+		return Result.Success(response);
+	}
 
 	public async Task<Result<UserProfileResponse>> GetProfileAsync(string userId)
 	{
