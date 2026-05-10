@@ -12,8 +12,8 @@ using Template.Api.Persistence;
 namespace Template.Api.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260429124717_UpdateRolesTables")]
-    partial class UpdateRolesTables
+    [Migration("20260510113616_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,6 +110,13 @@ namespace Template.Api.Persistence.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "019dd94b-9c35-78a3-b7e1-905263792220",
+                            RoleId = "019dd94b-9c35-78a3-b7e1-90544b8be79e"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -162,6 +169,26 @@ namespace Template.Api.Persistence.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "019dd94b-9c35-78a3-b7e1-90544b8be79e",
+                            ConcurrencyStamp = "019dd94b-9c35-78a3-b7e1-90552fb9ab80",
+                            IsDefault = false,
+                            IsDeleted = false,
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "019dd94b-9c35-78a3-b7e1-90560e296a0b",
+                            ConcurrencyStamp = "019dd94b-9c35-78a3-b7e1-90575fd7c247",
+                            IsDefault = true,
+                            IsDeleted = false,
+                            Name = "Member",
+                            NormalizedName = "MEMBER"
+                        });
                 });
 
             modelBuilder.Entity("Template.Api.Entities.ApplicationUser", b =>
@@ -176,13 +203,7 @@ namespace Template.Api.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -209,10 +230,8 @@ namespace Template.Api.Persistence.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -236,10 +255,6 @@ namespace Template.Api.Persistence.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PendingEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -251,9 +266,6 @@ namespace Template.Api.Persistence.Migrations
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -270,6 +282,30 @@ namespace Template.Api.Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "019dd94b-9c35-78a3-b7e1-905263792220",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "019dd94b-9c35-78a3-b7e1-9053bc21473b",
+                            DateOfBirth = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@template.com",
+                            EmailConfirmed = true,
+                            FirstName = "Template",
+                            Gender = 0,
+                            IsDisabled = false,
+                            LastName = "Admin",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@TEMPLATE.COM",
+                            NormalizedUserName = "ADMIN@TEMPLATE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEb4m4HWcwdNhyuLoVUfe255hAp2E8U9fa2QzfIHzOUYTI4khgryMuyWVsHcOslRVA==",
+                            PhoneNumber = "01129865159",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "045A9DEA16F5473DA2C73C6D788FEACE",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@template.com"
+                        });
                 });
 
             modelBuilder.Entity("Template.Api.Entities.PasswordResetCode", b =>

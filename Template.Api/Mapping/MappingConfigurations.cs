@@ -16,9 +16,14 @@ public class MappingConfigurations : IRegister
 
 		config.NewConfig<(ApplicationUser user, IList<string> roles), UserResponse>()
 				.Map(dest => dest, src => src.user)
+				.Map(dest => dest.DateOfBirth, src => src.user.DateOfBirth.ToString("yyyy-MM-dd"))
 				.Map(dest => dest.Roles, src => src.roles);
 
 		config.NewConfig<CreateUserRequest, ApplicationUser>()
-			.Map(dest => dest.UserName, src => src.Email);
+			.Map(dest => dest.UserName, src => src.Email)
+			.Map(dest => dest.DateOfBirth, src => src.DateOfBirth.ToDateTime(TimeOnly.MinValue));
+
+		config.NewConfig<UpdateUserRequest, ApplicationUser>()
+		   .Map(dest => dest.DateOfBirth, src => src.DateOfBirth.ToDateTime(TimeOnly.MinValue));
 	}
 }

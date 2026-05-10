@@ -1,7 +1,4 @@
-﻿using Azure;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace Template.Api.Services;
+﻿namespace Template.Api.Services;
 public class UserService : IUserService
 {
 	private readonly UserManager<ApplicationUser> _userManager;
@@ -42,17 +39,23 @@ public class UserService : IUserService
 						   u.Email,
 						   u.FirstName,
 						   u.LastName,
+						   u.PhoneNumber,
+						   u.DateOfBirth,
+						   u.Gender,
 						   u.IsDisabled,
 						   Roles = roles.Select(x => x.Name).ToList()
 					   }
 					   )
-					   .GroupBy(u => new { u.Id, u.Email, u.FirstName, u.LastName, u.IsDisabled })
+					   .GroupBy(u => new { u.Id, u.Email, u.FirstName, u.LastName, u.PhoneNumber, u.DateOfBirth, u.Gender, u.IsDisabled })
 					   .Select(u => new UserResponse
 					   (
 						   u.Key.Id,
 						   u.Key.Email,
 						   u.Key.FirstName,
 						   u.Key.LastName,
+						   u.Key.PhoneNumber,
+						   u.Key.DateOfBirth.ToString("yyyy-MM-dd"),
+						   u.Key.Gender.ToString()!,
 						   u.Key.IsDisabled,
 						   u.SelectMany(x => x.Roles)
 					   ))
@@ -76,6 +79,11 @@ public class UserService : IUserService
 
 		if (emailExists)
 			return Result.Failure<UserResponse>(UserErrors.DuplicatedEmail);
+
+		var phoneNumberExists = await _userManager.Users.AnyAsync(x => x.PhoneNumber == request.PhoneNumber, cancellationToken);
+
+		if (phoneNumberExists)
+			return Result.Failure<UserResponse>(UserErrors.DuplicatedPhoneNumber);
 
 		var allowedRoles = await _roleService.GetAllAsync(cancellationToken: cancellationToken);
 
@@ -111,6 +119,11 @@ public class UserService : IUserService
 
 		if (emailIsExists)
 			return Result.Failure(UserErrors.DuplicatedEmail);
+
+		var phoneNumberIsExists = await _userManager.Users.AnyAsync(x => x.PhoneNumber == request.PhoneNumber && x.Id != id, cancellationToken);
+
+		if (phoneNumberIsExists)
+			return Result.Failure(UserErrors.DuplicatedPhoneNumber);
 
 		var allowedRoles = await _roleService.GetAllAsync(cancellationToken: cancellationToken);
 

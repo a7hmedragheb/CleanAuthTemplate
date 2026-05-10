@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using System.Threading;
 
 namespace Template.Api.Controllers;
 
