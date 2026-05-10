@@ -17,7 +17,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"ahmedragheb090@gmail.com\",\r\n    \"Password\": \"P@ssword1234\"\r\n}",
+              "raw": "{\r\n    \"email\": \"admin@template.com\",\r\n    \"Password\": \"P@ssword123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -152,7 +152,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"userId\": \"019d261b-eb3c-79dc-a497-24ed48b58baf \",\r\n    \"code\":\"Q2ZESjhJOHNwSVMvT0k5Tm1sdmZ6S3hlbUY4ZmpmaDFEalBJSU9pNW8zQndlS0c0d2w4OWFCZW9rd2dxQ1hySiticVZESStMeUxzRHZIaUJkTWkxZW84L1c0M2lxZ3F0UEF2aEhEclNWS2ZFZDlpTGpJOTRqUHo2L1B3Q25yb2puOFNWU1ZycGZuclkzS0Z4QzJqR29FSEM3bEpiMi9oSnVBNHRPdzJLNUZ5dk54Uy9GNmoxZ3N6TDEvbkxFZEJDR1J4ZlZkcWY4QTNVT0lSUWxJM2wzMkFaZVA1elB1Q1pOOW9wSW9QMGF5a0pIU1dVbG5XL05BTHRUOVBpeVRaaFpkL3Fndz09\"\r\n}",
+              "raw": "{\r\n    \"userId\": \"019dd9bd-55a8-7f71-9d8e-2fe7e0bf5f19\",\r\n    \"code\":\"Q2ZESjhBVlh3eURTb0V4R203OU9SNkFkM3d6aTVUY3V0aHJyQ002VXI2akl1QjFvbGxTT1dCNk54VmdVVDIxRUdhc1QvOWZ3TVRvM0VlL3hRWEFWTGdEdzNIRURFMmJUcGNVNU5wNkRnYXd4bWFRRlc1eWM3anJhOWdJQ2RXWU1vK0RQZ1J2V0VnZzdRL3BRL2s5QWtwVmtNckpyL0pOc0tqN2RaeTJydXVidG01enFuT1FGUG85bkE0T0NtNWJRTmdLNWcreFVJTy9PVGZMSk1SdVliVEtORXdyNWIrd1lxUUZDOFo5VUgxeWd3YlpWaFl4elRFMzRQQVo4QlVSY28yTTBYZz09\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -239,7 +239,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"ahmedragheb090@gmail.com\",\r\n    \"code\": \"884042\"\r\n}",
+              "raw": "{\r\n    \"email\": \"ahmedragheb090@gmail.com\",\r\n    \"code\": \"353557\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -268,7 +268,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"ahmedragheb090@gmail.com\",\r\n    \"code\": \"884042\",\r\n    \"newPassword\": \"P@ssword1234\",\r\n    \"ConfirmPassword\": \"P@ssword1234\"\r\n}",
+              "raw": "{\r\n    \"email\": \"ahmedragheb090@gmail.com\",\r\n    \"code\": \"353557\",\r\n    \"newPassword\": \"P@ssword1234\",\r\n    \"ConfirmPassword\": \"P@ssword1234\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -335,7 +335,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTE1ZS1iZmQxLTc2OTMtODk0OC0yZGFkOTQ0YjJkODciLCJlbWFpbCI6ImE3aG1lZHJhZ2hlYkBnbWFpbC5jb20iLCJnaXZlbl9uYW1lIjoiQWhtZWQiLCJmYW1pbHlfbmFtZSI6IlJhZ2hlYiIsImdlbmRlciI6Ik1hbGUiLCJiaXJ0aGRhdGUiOiIxOTk1LTA1LTE1IiwianRpIjoiMDE5ZDIxNjAtZWRhYy03YjI4LTgxNzItNzU5NzdmZDM4M2FjIiwiZXhwIjoxNzc0MzgzMjkzLCJpc3MiOiJUZW1wbGF0ZSIsImF1ZCI6IlRlbXBsYXRlIHVzZXJzIn0.w4GMkGi2e8FiX4J7Seb2ylkMDU33fAymnCXhLFgSlNs",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZDk0Yi05YzM1LTc4YTMtYjdlMS05MDUyNjM3OTIyMjAiLCJlbWFpbCI6ImFkbWluQHRlbXBsYXRlLmNvbSIsImdpdmVuX25hbWUiOiJUZW1wbGF0ZSIsImZhbWlseV9uYW1lIjoiQWRtaW4iLCJnZW5kZXIiOiIiLCJiaXJ0aGRhdGUiOiIwMDAxLTAxLTAxIiwianRpIjoiMDE5ZGQ5ZWMtYWYxMy03ZmIwLTg5NjctZTMyMTRmM2YyMmEyIiwicm9sZXMiOlsiQWRtaW4iXSwiZXhwIjoxNzc3NDc5NDYwLCJpc3MiOiJUZW1wbGF0ZSIsImF1ZCI6IlRlbXBsYXRlIHVzZXJzIn0.q3WPdLK_EM1f3d8Wp_lrtsf1h0jkFmPd9WSmDSSytdI",
                   "type": "string"
                 }
               ]
@@ -374,7 +374,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTgzMC1mYzUxLTc4YTktODgzMi0xZWZkNjZhMTVhY2YiLCJlbWFpbCI6ImFobWVkcmFnaGViMDkwQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJBaG1lZCIsImZhbWlseV9uYW1lIjoiUmFnaGViIiwiZ2VuZGVyIjoiTWFsZSIsImJpcnRoZGF0ZSI6IjAwMDEtMDEtMDEiLCJqdGkiOiIwMTlkMWEyYy0wNGFhLTdiMzgtYTFmOC0zMDY3NTQ5MGZkOWUiLCJleHAiOjE3NzQyNjIzODUsImlzcyI6IlRlbXBsYXRlIiwiYXVkIjoiVGVtcGxhdGUgdXNlcnMifQ.NA6I_15HT4yXcbJvW2OoL4SsbxMI5sly6FKtn_cK034",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMWE0Mi1hMjE0LTcwMmEtYmEzYS05OTYxMmMxMDNjMWQiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6Ik1vc3RhZmEiLCJmYW1pbHlfbmFtZSI6IlJhZ2hlYiIsImdlbmRlciI6Ik1hbGUiLCJiaXJ0aGRhdGUiOiIyMDAzLTEyLTE3IiwianRpIjoiMDE5ZDMxZDAtMDVjNi03ZTk4LWIwYjYtMDI4MjJkMmEzY2MyIiwiZXhwIjoxNzc0NjU5MDA5LCJpc3MiOiJUZW1wbGF0ZSIsImF1ZCI6IlRlbXBsYXRlIHVzZXJzIn0.1jk2ITBJHU6zv0MsihdjCrV41iQbQq0dTmIenTXnpNU",
                   "type": "string"
                 }
               ]
@@ -383,7 +383,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"firstName\": \"Ahmed\",\r\n    \"lastName\": \"Ragheb\",\r\n    \"phoneNumber\": \"01519856195\",\r\n    \"dateOfBirth\": \"2003-12-17\",\r\n    \"gender\": 0\r\n}",
+              "raw": "{\r\n    \"firstName\": \"Ahmed\",\r\n    \"lastName\": \"Ragheb\",\r\n    \"phoneNumber\": \"01519856195\",\r\n    \"dateOfBirth\": \"2003-12-17\",\r\n    \"gender\": 1\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -413,7 +413,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMTgzMC1mYzUxLTc4YTktODgzMi0xZWZkNjZhMTVhY2YiLCJlbWFpbCI6ImFobWVkcmFnaGViMDkwQGdtYWlsLmNvbSIsImdpdmVuX25hbWUiOiJBaG1lZCIsImZhbWlseV9uYW1lIjoiUmFnaGViIiwiZ2VuZGVyIjoiTWFsZSIsImJpcnRoZGF0ZSI6IjAwMDEtMDEtMDEiLCJqdGkiOiIwMTlkMWEyYy0wNGFhLTdiMzgtYTFmOC0zMDY3NTQ5MGZkOWUiLCJleHAiOjE3NzQyNjIzODUsImlzcyI6IlRlbXBsYXRlIiwiYXVkIjoiVGVtcGxhdGUgdXNlcnMifQ.NA6I_15HT4yXcbJvW2OoL4SsbxMI5sly6FKtn_cK034",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkMWE0Mi1hMjE0LTcwMmEtYmEzYS05OTYxMmMxMDNjMWQiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIiwiZ2l2ZW5fbmFtZSI6Ik1vc3RhZmEiLCJmYW1pbHlfbmFtZSI6IlJhZ2hlYiIsImdlbmRlciI6Ik1hbGUiLCJiaXJ0aGRhdGUiOiIyMDAzLTEyLTE3IiwianRpIjoiMDE5ZDMxZDAtMDVjNi03ZTk4LWIwYjYtMDI4MjJkMmEzY2MyIiwiZXhwIjoxNzc0NjU5MDA5LCJpc3MiOiJUZW1wbGF0ZSIsImF1ZCI6IlRlbXBsYXRlIHVzZXJzIn0.1jk2ITBJHU6zv0MsihdjCrV41iQbQq0dTmIenTXnpNU",
                   "type": "string"
                 }
               ]
@@ -421,16 +421,18 @@
             "method": "PUT",
             "header": [],
             "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"firstName\": \"Ahmed\",\r\n    \"lastName\": \"Ragheb\",\r\n    \"phoneNumber\": \"01519856195\",\r\n    \"dateOfBirth\": \"2003-12-17\",\r\n    \"gender\": 0\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "Image",
+                  "type": "file",
+                  "uuid": "e26dfa77-36f4-41ea-8a6b-9281de2f3eba",
+                  "src": "/E:/Sources/MVC/avatar.png"
                 }
-              }
+              ]
             },
             "url": {
-              "raw": "https://localhost:7131/Account/update-avatar",
+              "raw": "https://localhost:7131/Account/update-profile-image",
               "protocol": "https",
               "host": [
                 "localhost"
@@ -438,7 +440,7 @@
               "port": "7131",
               "path": [
                 "Account",
-                "update-avatar"
+                "update-profile-image"
               ]
             }
           },
@@ -523,7 +525,7 @@
           "response": []
         },
         {
-          "name": "Change Email Change",
+          "name": "Confirm Email Change",
           "request": {
             "auth": {
               "type": "bearer",
@@ -595,6 +597,410 @@
               "path": [
                 "Account",
                 "delete-account"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Get All",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6Ik1hbGUiLCJqdGkiOiIwMTlkZTA0MS0zMzk4LTc3MzctOTQ5ZC0yZWFkNWRlOWE3ZGMiLCJyb2xlcyI6WyJBZG1pbiJdLCJleHAiOjE3Nzc1ODU2NjIsImlzcyI6IkRWTEQiLCJhdWQiOiJEVkxEIHVzZXJzIn0.FjK3HoCYddJH76oihmzB9c6AYlnWUWvMVbPDozo1Q7k",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Host}}/api/roles?includeDisabled=true",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "roles"
+              ],
+              "query": [
+                {
+                  "key": "includeDisabled",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6IiIsImp0aSI6IjAxOWRkYThlLTk2MTctN2EwZS1hYThmLWY5NWUxYjRlOTE0ZSIsInJvbGVzIjpbIkFkbWluIl0sImV4cCI6MTc3NzQ5MDA3MCwiaXNzIjoiRFZMRCIsImF1ZCI6IkRWTEQgdXNlcnMifQ.EtZyFi6VhcmitkVspJG36zZ9LXo8dFu2qjHbtF88Bpw",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Host}}/api/roles?includeDisabled=false",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "roles"
+              ],
+              "query": [
+                {
+                  "key": "includeDisabled",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get By Id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6IiIsImp0aSI6IjAxOWRkYTViLTJjZWItN2UxMS1hNWYyLWQwM2VkN2ZkNTQzMSIsInJvbGVzIjpbIkFkbWluIl0sImV4cCI6MTc3NzQ4NjcwMSwiaXNzIjoiRFZMRCIsImF1ZCI6IkRWTEQgdXNlcnMifQ.FG2MfzG-8JbtGlOZxojBYcuUCYKHk2rDL-uFEL7Lwb0",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Host}}/api/roles/019dda6a-b4a2-70e7-9ece-6538c73d35a8",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "roles",
+                "019dda6a-b4a2-70e7-9ece-6538c73d35a8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Role",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6IiIsImp0aSI6IjAxOWRkYTViLTJjZWItN2UxMS1hNWYyLWQwM2VkN2ZkNTQzMSIsInJvbGVzIjpbIkFkbWluIl0sImV4cCI6MTc3NzQ4NjcwMSwiaXNzIjoiRFZMRCIsImF1ZCI6IkRWTEQgdXNlcnMifQ.FG2MfzG-8JbtGlOZxojBYcuUCYKHk2rDL-uFEL7Lwb0",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Owner\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Host}}/api/roles",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "roles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6IiIsImp0aSI6IjAxOWRkYThlLTk2MTctN2EwZS1hYThmLWY5NWUxYjRlOTE0ZSIsInJvbGVzIjpbIkFkbWluIl0sImV4cCI6MTc3NzQ5MDA3MCwiaXNzIjoiRFZMRCIsImF1ZCI6IkRWTEQgdXNlcnMifQ.EtZyFi6VhcmitkVspJG36zZ9LXo8dFu2qjHbtF88Bpw",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Admi\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Host}}/api/roles/019dda6a-b4a2-70e7-9ece-6538c73d35a1",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "roles",
+                "019dda6a-b4a2-70e7-9ece-6538c73d35a1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6IiIsImp0aSI6IjAxOWRkYThlLTk2MTctN2EwZS1hYThmLWY5NWUxYjRlOTE0ZSIsInJvbGVzIjpbIkFkbWluIl0sImV4cCI6MTc3NzQ5MDA3MCwiaXNzIjoiRFZMRCIsImF1ZCI6IkRWTEQgdXNlcnMifQ.EtZyFi6VhcmitkVspJG36zZ9LXo8dFu2qjHbtF88Bpw",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{Host}}/api/roles/019dda6a-b4a2-70e7-9ece-6538c73d35a8/toggle-status",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "roles",
+                "019dda6a-b4a2-70e7-9ece-6538c73d35a8",
+                "toggle-status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6Ik1hbGUiLCJqdGkiOiIwMTlkZTA2OC05MmNiLTcxZmMtODYyZi1mYzEyODI5NjcxN2QiLCJyb2xlcyI6WyJBZG1pbiJdLCJleHAiOjE3Nzc1ODgyNDIsImlzcyI6IkRWTEQiLCJhdWQiOiJEVkxEIHVzZXJzIn0.ymDvdTaysN0mWWt1Cy9FBcRgbKzg5t1m-tU5V6GYROQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Host}}/api/users",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get By Id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6Ik1hbGUiLCJqdGkiOiIwMTlkZTA2OC05MmNiLTcxZmMtODYyZi1mYzEyODI5NjcxN2QiLCJyb2xlcyI6WyJBZG1pbiJdLCJleHAiOjE3Nzc1ODgyNDIsImlzcyI6IkRWTEQiLCJhdWQiOiJEVkxEIHVzZXJzIn0.ymDvdTaysN0mWWt1Cy9FBcRgbKzg5t1m-tU5V6GYROQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Host}}/api/users/019de044-7a9b-7f56-b290-165c704b9e7e",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "019de044-7a9b-7f56-b290-165c704b9e7e"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6Ik1hbGUiLCJqdGkiOiIwMTlkZTA0MS0zMzk4LTc3MzctOTQ5ZC0yZWFkNWRlOWE3ZGMiLCJyb2xlcyI6WyJBZG1pbiJdLCJleHAiOjE3Nzc1ODU2NjIsImlzcyI6IkRWTEQiLCJhdWQiOiJEVkxEIHVzZXJzIn0.FjK3HoCYddJH76oihmzB9c6AYlnWUWvMVbPDozo1Q7k",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"test1@test.com\",\r\n    \"firstName\": \"first\",\r\n    \"lastName\": \"Last\",\r\n    \"countryId\": 1,\r\n    \"nationalId\": \"29801011234567\",\r\n    \"phoneNumber\": \"01159895398\",\r\n    \"password\": \"P@ssword123\",\r\n    \"roles\": [\r\n        \"Sub_Owner\"\r\n    ]\r\n\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Host}}/api/users",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6Ik1hbGUiLCJqdGkiOiIwMTlkZTA2OC05MmNiLTcxZmMtODYyZi1mYzEyODI5NjcxN2QiLCJyb2xlcyI6WyJBZG1pbiJdLCJleHAiOjE3Nzc1ODgyNDIsImlzcyI6IkRWTEQiLCJhdWQiOiJEVkxEIHVzZXJzIn0.ymDvdTaysN0mWWt1Cy9FBcRgbKzg5t1m-tU5V6GYROQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"firstName\": \"first\",\r\n    \"lastName\": \"Last\",\r\n    \"countryId\": 1,\r\n    \"phoneNumber\": \"01159895395\",\r\n    \"roles\": [\r\n        \"Sub_Owner\"\r\n    ]\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Host}}/api/users/019de044-7a9b-7f56-b290-165c704b9e7e",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "019de044-7a9b-7f56-b290-165c704b9e7e"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6Ik1hbGUiLCJqdGkiOiIwMTlkZTA0ZS1hMzVjLTdlYTItOTg3ZC0xZWQ2MTljMTYzM2UiLCJyb2xlcyI6WyJBZG1pbiJdLCJleHAiOjE3Nzc1ODY1NDMsImlzcyI6IkRWTEQiLCJhdWQiOiJEVkxEIHVzZXJzIn0.pafyyye7qLAO2j0GKN9MkiuOjHkj9xtzDV0N-ZK83oE",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{Host}}/api/users/019de044-7a9b-7f56-b290-165c704b9e7e/toggle-status",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "019de044-7a9b-7f56-b290-165c704b9e7e",
+                "toggle-status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unlock",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTlkZGEwMi0xNzQ0LTdkYTEtOTUwZC0zNDU4NmIwNzFlMjQiLCJlbWFpbCI6ImFkbWluQERWTEQuY29tIiwiZ2l2ZW5fbmFtZSI6IkRWTEQiLCJmYW1pbHlfbmFtZSI6IkFkbWluIiwiYmlydGhkYXRlIjoiMjAwMC0wMS0wMSIsImdlbmRlciI6Ik1hbGUiLCJqdGkiOiIwMTlkZTA1YS04OTlmLTdjOTctYWY0OC03Y2E4OTZlOTk3Y2EiLCJyb2xlcyI6WyJBZG1pbiJdLCJleHAiOjE3Nzc1ODczMjMsImlzcyI6IkRWTEQiLCJhdWQiOiJEVkxEIHVzZXJzIn0.XYJHsj6pMJqt6YXtLHoIlM1GKCXfmysMGikZEdZO_t0",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{Host}}/api/users/019de044-7a9b-7f56-b290-165c704b9e7e/unlock",
+              "host": [
+                "{{Host}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "019de044-7a9b-7f56-b290-165c704b9e7e",
+                "unlock"
               ]
             }
           },
