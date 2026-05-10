@@ -2,10 +2,12 @@
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Template.Api.Persistence.Migrations
 {
 	/// <inheritdoc />
-	public partial class InitialTemplateSetup : Migration
+	public partial class InitialCreate : Migration
 	{
 		/// <inheritdoc />
 		protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,6 +17,8 @@ namespace Template.Api.Persistence.Migrations
 				columns: table => new
 				{
 					Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+					IsDefault = table.Column<bool>(type: "bit", nullable: false),
+					IsDeleted = table.Column<bool>(type: "bit", nullable: false),
 					Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
 					NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
 					ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -29,15 +33,11 @@ namespace Template.Api.Persistence.Migrations
 				columns: table => new
 				{
 					Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-					CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-					UpdatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
 					FirstName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
 					LastName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
 					DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
 					Gender = table.Column<int>(type: "int", nullable: true),
-					PendingEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-					IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-					DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+					IsDisabled = table.Column<bool>(type: "bit", nullable: false),
 					ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
 					ImageThumbnailUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
 					ImagePublicId = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -188,7 +188,7 @@ namespace Template.Api.Persistence.Migrations
 						column: x => x.UserId,
 						principalTable: "AspNetUsers",
 						principalColumn: "Id",
-						onDelete: ReferentialAction.Cascade);
+						onDelete: ReferentialAction.Restrict);
 				});
 
 			migrationBuilder.CreateTable(
@@ -213,6 +213,25 @@ namespace Template.Api.Persistence.Migrations
 						principalColumn: "Id",
 						onDelete: ReferentialAction.Cascade);
 				});
+
+			migrationBuilder.InsertData(
+				table: "AspNetRoles",
+				columns: new[] { "Id", "ConcurrencyStamp", "IsDefault", "IsDeleted", "Name", "NormalizedName" },
+				values: new object[,]
+				{
+					{ "019dd94b-9c35-78a3-b7e1-90544b8be79e", "019dd94b-9c35-78a3-b7e1-90552fb9ab80", false, false, "Admin", "ADMIN" },
+					{ "019dd94b-9c35-78a3-b7e1-90560e296a0b", "019dd94b-9c35-78a3-b7e1-90575fd7c247", true, false, "Member", "MEMBER" }
+				});
+
+			migrationBuilder.InsertData(
+				table: "AspNetUsers",
+				columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "DateOfBirth", "Email", "EmailConfirmed", "FirstName", "Gender", "ImagePublicId", "ImageThumbnailUrl", "ImageUrl", "IsDisabled", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+				values: new object[] { "019dd94b-9c35-78a3-b7e1-905263792220", 0, "019dd94b-9c35-78a3-b7e1-9053bc21473b", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@template.com", true, "Template", 0, null, null, null, false, "Admin", false, null, "ADMIN@TEMPLATE.COM", "ADMIN@TEMPLATE.COM", "AQAAAAIAAYagAAAAEEb4m4HWcwdNhyuLoVUfe255hAp2E8U9fa2QzfIHzOUYTI4khgryMuyWVsHcOslRVA==", "01129865159", false, "045A9DEA16F5473DA2C73C6D788FEACE", false, "admin@template.com" });
+
+			migrationBuilder.InsertData(
+				table: "AspNetUserRoles",
+				columns: new[] { "RoleId", "UserId" },
+				values: new object[] { "019dd94b-9c35-78a3-b7e1-90544b8be79e", "019dd94b-9c35-78a3-b7e1-905263792220" });
 
 			migrationBuilder.CreateIndex(
 				name: "IX_AspNetRoleClaims_RoleId",

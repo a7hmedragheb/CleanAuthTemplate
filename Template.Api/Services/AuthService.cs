@@ -270,7 +270,8 @@ public class AuthService : IAuthService
 		.SingleOrDefaultAsync(u => u.Email == payload.Email, cancellationToken);
 
 		if (user is not null && user.IsDisabled)
-			return Result.Failure<AuthResult>(UserErrors.UserNotFound);
+			return Result.Failure<AuthResult>(UserErrors.DisabledUser);
+
 
 		if (user is null)
 		{
@@ -287,14 +288,14 @@ public class AuthService : IAuthService
 
 			var createResult = await _userManager.CreateAsync(user);
 
-			await _userManager.AddToRoleAsync(user, DefaultRoles.Member.Name);
-
 
 			if (!createResult.Succeeded)
 			{
 				var error = createResult.Errors.First();
 				return Result.Failure<AuthResult>(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
 			}
+
+			await _userManager.AddToRoleAsync(user, DefaultRoles.Member.Name);
 
 			await SendWelcomeEmailAsync(user);
 		}

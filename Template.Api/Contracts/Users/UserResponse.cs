@@ -5,6 +5,9 @@ public record UserResponse(
 	string FirstName,
 	string LastName,
 	string Email,
+	string? PhoneNumber,
+	string DateOfBirth,
+	string Gender,
 	bool IsDisabled,
 	IEnumerable<string> Roles
 );

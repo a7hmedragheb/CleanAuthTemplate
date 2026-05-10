@@ -2,7 +2,7 @@
 
 public static class DefaultUsers
 {
-	public partial class Admin  
+	public partial class Admin
 	{
 		public const string Id = "019dd94b-9c35-78a3-b7e1-905263792220";
 		public const string Email = "admin@template.com";

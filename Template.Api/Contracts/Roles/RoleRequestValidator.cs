@@ -1,6 +1,4 @@
-﻿using Template.Api.Contracts.Roles;
-
-namespace Template.Api.Contracts.Roles;
+﻿namespace Template.Api.Contracts.Roles;
 
 public class RoleRequestValidator : AbstractValidator<RoleRequest>
 {

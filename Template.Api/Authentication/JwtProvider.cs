@@ -13,7 +13,7 @@ public class JwtProvider : IJwtProvider
 		_jwtOptions = jwtOptions.Value;
 	}
 
-	public (string token, int expiresIn) GenerateToken(ApplicationUser user , IEnumerable<string> roles)
+	public (string token, int expiresIn) GenerateToken(ApplicationUser user, IEnumerable<string> roles)
 	{
 		Claim[] claims = [
 			new(JwtRegisteredClaimNames.Sub, user.Id),
