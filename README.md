@@ -80,16 +80,22 @@ cd CleanAuthTemplate
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=.;Database=CleanAuthDb;Trusted_Connection=True;TrustServerCertificate=True"
+    "DefaultConnection": "Server=.;Database=CleanAuthDb;Trusted_Connection=True;TrustServerCertificate=True",
+    "HangfireConnection": "Server=.;Database=AuthTemplateJobs;Trusted_Connection=True;TrustServerCertificate=True"
   },
-
+ "Logging": {
+   "LogLevel": {
+     "Default": "Information",
+     "Microsoft.AspNetCore": "Warning",
+     "Hangfire": "Information"
+   }
+ },
   "JwtSettings": {
     "Key": "YOUR_SUPER_SECRET_KEY_MIN_32_CHARS",
     "Issuer": "Template",
     "Audience": "Template Users",
     "ExpiryMinutes": 30
   },
-
   "MailSettings": {
     "Mail": "your@email.com",
     "DisplayName": "Template",
@@ -101,16 +107,19 @@ cd CleanAuthTemplate
   "GoogleSettings": {
     "ClientId": "YOUR_GOOGLE_CLIENT_ID"
   },
-
   "CloudinarySettings": {
     "CloudName": "your_cloud_name",
     "ApiKey": "your_api_key",
     "ApiSecret": "your_api_secret"
   },
-
-  "AppSettings": {
-    "FrontendBaseUrl": "https://your-frontend.com"
-  }
+ "HangfireSettings": {
+   "Username": "your_hangfire_username",
+   "Password": "your_hangfire_password"
+ },
+"AppSettings": {
+    "FrontendBaseUrl": "http://localhost:3000"
+  },
+  "AllowedOrigins": [ "https://yourdomain.com" ]
 }
 ```
 
